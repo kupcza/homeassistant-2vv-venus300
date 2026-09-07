@@ -1,0 +1,238 @@
+# =====================================================================
+# 2VV AirGENIO "Venus 300" HRU — Modbus TCP
+# Included from configuration.yaml via:  modbus: !include modbus.yaml
+#
+# IMPORTANT: addresses in MODBUS_V1_FW166_167.xlsx are documented as
+# "PLC Addresses - BASE1" (1-based PLC reference numbers). The actual
+# Modbus wire address is always (documented address - 1). Every
+# address below has already had 1 subtracted from the sheet's number —
+# do not use the raw sheet numbers directly.
+#
+# Unit has no heaters and no AQS sensor.
+# =====================================================================
+
+- name: venus_300
+  type: tcp
+  host: 192.168.0.176 # Replace with your AirGENIO unit's IP address
+  port: 502
+  delay: 0
+  timeout: 5
+  message_wait_milliseconds: 30
+
+  # ---- Control (Holding Registers, SHARE sheet) ----
+  switches:
+    - name: "Venus 300 Power"
+      unique_id: venus300_power
+      address: 21000 # doc 21001, SwitchON, 0=OFF 1=ON
+      slave: 1
+      write_type: holding
+      command_on: 1
+      command_off: 0
+      verify:
+        input_type: holding
+        address: 21000
+
+    - name: "Venus 300 Freecooling Mode"
+      unique_id: venus300_freecooling_mode
+      address: 21010 # doc 21011, SHARE: FreecoolingMode. 0=OFF 1=ON
+      slave: 1
+      write_type: holding
+      command_on: 1
+      command_off: 0
+      verify:
+        input_type: holding
+        address: 21010
+
+  # ---- Status / monitoring (Input Registers, 0x04 unless noted) ----
+  sensors:
+    - name: "Venus 300 Fan Power Setpoint" # read-only readback of what's written by automation
+      unique_id: venus300_fan_power_setpoint
+      address: 21001 # doc 21002, AirFlowManual, ‰ of fan power in MANUAL mode
+      slave: 1
+      input_type: holding # lives in a holding register, not input
+      data_type: uint16
+      scale: 0.1 # raw ‰ (0-1000) -> %
+      precision: 0
+      unit_of_measurement: "%"
+      state_class: measurement
+
+    - name: "Venus 300 Modbus Port (readback)"
+      unique_id: venus300_modbus_port
+      address: 16020 # doc 16021, INFO: ModbusPort
+      slave: 1
+      input_type: input
+      data_type: uint16
+
+    # --- Temperatures, signed, x10 scale ---
+    - name: "Venus 300 Outside to Unit Temperature"
+      unique_id: venus300_temperature_outside_to_unit
+      address: 15016 # doc 15017, TempEXT1 - outside air
+      slave: 1
+      input_type: input
+      data_type: int16
+      scale: 0.1
+      precision: 1
+      unit_of_measurement: "°C"
+      device_class: temperature
+      state_class: measurement
+
+    - name: "Venus 300 Unit to House Temperature"
+      unique_id: venus300_temperature_unit_to_house
+      address: 15017 # doc 15018, TempEXT2 - after recuperator
+      slave: 1
+      input_type: input
+      data_type: int16
+      scale: 0.1
+      precision: 1
+      unit_of_measurement: "°C"
+      device_class: temperature
+      state_class: measurement
+
+    - name: "Venus 300 House to Unit Temperature"
+      unique_id: venus300_temperature_house_to_unit
+      address: 15021 # doc 15022, TempINT1 - extract indoor air
+      slave: 1
+      input_type: input
+      data_type: int16
+      scale: 0.1
+      precision: 1
+      unit_of_measurement: "°C"
+      device_class: temperature
+      state_class: measurement
+
+    - name: "Venus 300 Unit to Outside Temperature"
+      unique_id: venus300_temperature_unit_to_outside
+      address: 15022 # doc 15023, TempINT2 - after recuperator, to outside
+      slave: 1
+      input_type: input
+      data_type: int16
+      scale: 0.1
+      precision: 1
+      unit_of_measurement: "°C"
+      device_class: temperature
+      state_class: measurement
+
+    # --- Fan power feedback, ‰ -> % ---
+    - name: "Venus 300 Inlet Fan Power"
+      unique_id: venus300_inlet_fan_power
+      address: 15012 # doc 15013, AirFlowInletFanManual
+      slave: 1
+      input_type: input
+      data_type: uint16
+      scale: 0.1
+      precision: 0
+      unit_of_measurement: "%"
+      state_class: measurement
+
+    - name: "Venus 300 Outlet Fan Power"
+      unique_id: venus300_outlet_fan_power
+      address: 15013 # doc 15014, AirFlowOutletFanManual
+      slave: 1
+      input_type: input
+      data_type: uint16
+      scale: 0.1
+      precision: 0
+      unit_of_measurement: "%"
+      state_class: measurement
+
+    # --- Measured airflow, m3/h ---
+    # REMOVED: "Venus 300 Inlet/Outlet Airflow" (doc 15015/15016, AirFlowInletFan/
+    # AirFlowOutletFan). These read from the unit's own uncalibrated estimate
+    # (no physical flow sensor fitted / calibration ratio off) and gave
+    # implausible numbers (e.g. 200-203 m3/h at 20% power on a 300 m3/h unit).
+    # Replaced with a simple linear calculation in template.yaml:
+    # "Venus 300 Inlet/Outlet Airflow (calculated)" = Fan Power % * 3.
+
+    # --- Filter life remaining, % ---
+    - name: "Venus 300 Inlet Filter Life"
+      unique_id: venus300_inlet_filter_life
+      address: 15043 # doc 15044, InletFilterPercent
+      slave: 1
+      input_type: input
+      data_type: uint16
+      unit_of_measurement: "%"
+      state_class: measurement
+
+    - name: "Venus 300 Outlet Filter Life"
+      unique_id: venus300_outlet_filter_life
+      address: 15044 # doc 15045, OutletFilterPercent
+      slave: 1
+      input_type: input
+      data_type: uint16
+      unit_of_measurement: "%"
+      state_class: measurement
+
+    # --- Bypass / free cooling ---
+    - name: "Venus 300 Bypass Position"
+      unique_id: venus300_bypass_position
+      address: 15040 # doc 15041, BypassPossition — live valve position, unit-controlled
+      slave: 1
+      input_type: input
+      data_type: uint16
+      unit_of_measurement: "%"
+      state_class: measurement
+
+    - name: "Venus 300 Bypass Type Raw" # feeds the template sensor in template.yaml
+      unique_id: venus300_bypass_type_raw
+      address: 10128 # doc 10129, FACTORY_SET: Bypass. 0=none 1=stepless 0-10V 2=open/close
+      slave: 1
+      input_type: holding
+      data_type: uint16
+
+    - name: "Venus 300 Bypass Temperature Threshold" # read-only readback of what's written by automation
+      unique_id: venus300_bypass_temp_threshold
+      address: 20036 # doc 20037, SERVICE: BypassTemperature, min outdoor temp to allow bypass
+      slave: 1
+      input_type: holding
+      data_type: uint16
+      unit_of_measurement: "°C"
+      device_class: temperature
+      state_class: measurement
+
+    # --- House temperature setpoint ---
+    - name: "Venus 300 Temperature Setpoint" # read-only readback of what's written by automation
+      unique_id: venus300_temperature_setpoint
+      address: 21002 # doc 21003, SHARE: Temperature — target house temp
+      slave: 1
+      input_type: holding
+      data_type: uint16
+      unit_of_measurement: "°C"
+      device_class: temperature
+      state_class: measurement
+
+    - name: "Venus 300 Temperature Sensor Selection Raw" # feeds the template sensor in template.yaml
+      unique_id: venus300_temp_sensor_selection_raw
+      address: 25008 # doc 25009, SERVICE_HARD: TempSensorSelection. 0=Supply duct 1=Extract duct 2=Room
+      slave: 1
+      input_type: holding
+      data_type: uint16
+
+    - name: "Venus 300 Ventilation Mode"
+      unique_id: venus300_diag_ventilation_mode
+      address: 24999 # doc 25000, SERVICE_HARD: VentilationMode. 0=Manual 1=DCV 2=CAV 3=VAV 4=VAVC4 5=PCO
+      slave: 1
+      input_type: holding
+      data_type: uint16
+
+    # --- Raw bitfield registers, feed the template binary_sensors in template.yaml.
+    #     They show as normal sensors (modbus platform has no entity_category option). ---
+    - name: "Venus 300 Global Status Raw"
+      unique_id: venus300_global_status_raw
+      address: 14999 # doc 15000, Unit global status1
+      slave: 1
+      input_type: input
+      data_type: uint16
+
+    - name: "Venus 300 Software Error 1 Raw"
+      unique_id: venus300_sw_error1_raw
+      address: 15001 # doc 15002, Software error1
+      slave: 1
+      input_type: input
+      data_type: uint16
+
+    - name: "Venus 300 Software Error 2 Raw"
+      unique_id: venus300_sw_error2_raw
+      address: 15002 # doc 15003, Software error2
+      slave: 1
+      input_type: input
+      data_type: uint16

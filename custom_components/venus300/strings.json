@@ -1,0 +1,127 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Connect to the 2VV Venus 300 (AirGenio) unit over Modbus TCP.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "slave_id": "Modbus slave/unit ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the unit. Check the host, port and network."
+    },
+    "abort": {
+      "already_configured": "This host and port are already configured."
+    }
+  },
+  "entity": {
+    "switch": {
+      "power": { "name": "Power" },
+      "freecooling_mode": { "name": "Freecooling mode" },
+      "freecooling_enable": { "name": "Freecooling enabled" }
+    },
+    "number": {
+      "fan_power_setpoint": { "name": "Fan power setpoint" },
+      "temperature_setpoint": { "name": "Temperature setpoint" },
+      "bypass_temp_threshold": { "name": "Bypass temperature threshold" },
+      "freecooling_airflow": { "name": "Freecooling airflow" },
+      "freecooling_temp_threshold": { "name": "Freecooling temperature threshold" },
+      "freecooling_on_month": { "name": "Freecooling season start month" },
+      "freecooling_on_day": { "name": "Freecooling season start day" },
+      "freecooling_on_hour": { "name": "Freecooling allowed-from hour" },
+      "freecooling_on_min": { "name": "Freecooling allowed-from minute" },
+      "freecooling_off_month": { "name": "Freecooling season end month" },
+      "freecooling_off_day": { "name": "Freecooling season end day" },
+      "freecooling_off_hour": { "name": "Freecooling allowed-until hour" },
+      "freecooling_off_min": { "name": "Freecooling allowed-until minute" }
+    },
+    "sensor": {
+      "temperature_outside_to_unit": { "name": "Outside to unit temperature" },
+      "temperature_unit_to_house": { "name": "Unit to house temperature" },
+      "temperature_house_to_unit": { "name": "House to unit temperature" },
+      "temperature_unit_to_outside": { "name": "Unit to outside temperature" },
+      "inlet_fan_power": { "name": "Inlet fan power" },
+      "outlet_fan_power": { "name": "Outlet fan power" },
+      "inlet_filter_life": { "name": "Inlet filter life" },
+      "outlet_filter_life": { "name": "Outlet filter life" },
+      "bypass_position": { "name": "Bypass position" },
+      "bypass_type": {
+        "name": "Bypass type",
+        "state": {
+          "none": "None",
+          "stepless_0_10v": "Stepless (0-10 V)",
+          "open_close": "Open/close"
+        }
+      },
+      "temp_sensor_selection": {
+        "name": "Temperature sensor selection",
+        "state": {
+          "supply_duct": "Supply duct",
+          "extract_duct": "Extract duct",
+          "room": "Room"
+        }
+      },
+      "ventilation_mode": {
+        "name": "Ventilation mode",
+        "state": {
+          "manual": "Manual",
+          "dcv": "DCV",
+          "cav": "CAV",
+          "vav": "VAV",
+          "vavc4": "VAV C4",
+          "pco": "pCO"
+        }
+      },
+      "modbus_port": { "name": "Modbus port (readback)" },
+      "global_status_raw": { "name": "Global status (raw)" },
+      "global_status2_raw": { "name": "Global status 2 (raw)" },
+      "sw_error1_raw": { "name": "Software error 1 (raw)" },
+      "sw_error2_raw": { "name": "Software error 2 (raw)" }
+    },
+    "binary_sensor": {
+      "manual_mode_active": { "name": "Manual mode active" },
+      "dcv_mode_active": { "name": "DCV mode active" },
+      "fire_mode_active": { "name": "Fire mode active" },
+      "boost_mode_active": { "name": "Boost mode active" },
+      "nobody_mode_active": { "name": "Nobody mode active" },
+      "freecooling_active": { "name": "Freecooling active" },
+      "timeswitch_mode_active": { "name": "Timeswitch mode active" },
+      "calibration_active": { "name": "Calibration active" },
+      "cooldown_active": { "name": "Cooldown active" },
+      "direct_control_active": { "name": "Direct control active" },
+      "filter_change_due": { "name": "Filter change due" },
+      "fw_update_error": { "name": "Firmware update error" },
+      "fw_update_active": { "name": "Firmware update active" },
+      "recirculation_active": { "name": "Recirculation active" },
+      "simulation_active": { "name": "Simulation active" },
+      "prefreecooling_active": { "name": "Prefreecooling active" },
+      "temp_flow_reduction_active": { "name": "Temperature flow reduction active" },
+      "passive_house_restriction_active": { "name": "Passive house restriction active" },
+      "adb_active": { "name": "ADB active" },
+      "vavc4_active": { "name": "VAV C4 active" },
+      "pco_active": { "name": "pCO active" },
+      "fan_inlet_error": { "name": "Fan inlet error" },
+      "fan_outlet_error": { "name": "Fan outlet error" },
+      "filter_inlet_error": { "name": "Filter inlet error" },
+      "filter_outlet_error": { "name": "Filter outlet error" },
+      "filter_inlet_warning": { "name": "Filter inlet warning" },
+      "filter_outlet_warning": { "name": "Filter outlet warning" },
+      "rotary_wheel_error": { "name": "Rotary wheel error" },
+      "adb_error": { "name": "ADB error" },
+      "dx_error": { "name": "DX error" },
+      "dx_defrost": { "name": "DX defrost" },
+      "condensate_drain": { "name": "Condensate drain" },
+      "g_error": { "name": "G error" },
+      "global_error": { "name": "Global error" },
+      "k_error": { "name": "K error" },
+      "filter_info_flag": { "name": "Filter info flag" },
+      "cfg_file_error": { "name": "Configuration file error" },
+      "filter_hepa_error": { "name": "HEPA filter error" },
+      "filter_hepa_warning": { "name": "HEPA filter warning" },
+      "ibus_gateway_error": { "name": "IBUS gateway error" }
+    }
+  }
+}
