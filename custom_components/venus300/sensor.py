@@ -9,7 +9,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfTemperature
+from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfPressure, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -20,8 +20,14 @@ from .registers import (
     BYPASS_POSITION,
     BYPASS_TYPE_OPTIONS,
     BYPASS_TYPE_RAW,
+    FILTER_DISABLE_STATUS_OPTIONS,
+    FILTER_DISABLE_STATUS_RAW,
+    FILTER_PRESSURE_INLET,
+    FILTER_PRESSURE_OUTLET,
     GLOBAL_STATUS2_RAW,
     GLOBAL_STATUS_RAW,
+    HEPA_FILTER_LIFE,
+    HEPA_FILTER_PRESSURE,
     INLET_FAN_POWER,
     INLET_FILTER_LIFE,
     MODBUS_PORT,
@@ -65,6 +71,12 @@ _PERCENT_KWARGS = {
     "state_class": SensorStateClass.MEASUREMENT,
     "native_unit_of_measurement": PERCENTAGE,
 }
+_PRESSURE_KWARGS = {
+    "device_class": SensorDeviceClass.PRESSURE,
+    "state_class": SensorStateClass.MEASUREMENT,
+    "native_unit_of_measurement": UnitOfPressure.PA,
+    "entity_category": EntityCategory.DIAGNOSTIC,
+}
 
 SENSORS = (
     Venus300SensorSpec(TEMP_OUTSIDE_TO_UNIT, "temperature_outside_to_unit", **_TEMP_KWARGS),
@@ -79,6 +91,18 @@ SENSORS = (
     ),
     Venus300SensorSpec(INLET_FILTER_LIFE, "inlet_filter_life", **_PERCENT_KWARGS),
     Venus300SensorSpec(OUTLET_FILTER_LIFE, "outlet_filter_life", **_PERCENT_KWARGS),
+    # Only meaningful if the corresponding dP sensor is physically fitted
+    # (FACTORY_SET SensorFilterIn/SensorFilterOut) — otherwise reads ~0.
+    Venus300SensorSpec(FILTER_PRESSURE_INLET, "filter_pressure_inlet", **_PRESSURE_KWARGS),
+    Venus300SensorSpec(FILTER_PRESSURE_OUTLET, "filter_pressure_outlet", **_PRESSURE_KWARGS),
+    # Only meaningful if a HEPA stage is fitted (FACTORY_SET HEPA_filter_used).
+    Venus300SensorSpec(
+        HEPA_FILTER_LIFE,
+        "hepa_filter_life",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        **_PERCENT_KWARGS,
+    ),
+    Venus300SensorSpec(HEPA_FILTER_PRESSURE, "hepa_filter_pressure", **_PRESSURE_KWARGS),
     Venus300SensorSpec(BYPASS_POSITION, "bypass_position", **_PERCENT_KWARGS),
     Venus300SensorSpec(
         BYPASS_TYPE_RAW,
@@ -86,6 +110,13 @@ SENSORS = (
         device_class=SensorDeviceClass.ENUM,
         entity_category=EntityCategory.DIAGNOSTIC,
         options=BYPASS_TYPE_OPTIONS,
+    ),
+    Venus300SensorSpec(
+        FILTER_DISABLE_STATUS_RAW,
+        "filter_disable_status",
+        device_class=SensorDeviceClass.ENUM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        options=FILTER_DISABLE_STATUS_OPTIONS,
     ),
     Venus300SensorSpec(
         TEMP_SENSOR_SELECTION_RAW,

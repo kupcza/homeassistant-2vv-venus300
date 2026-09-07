@@ -21,12 +21,17 @@
     "switch": {
       "power": { "name": "Power" },
       "freecooling_mode": { "name": "Freecooling mode" },
-      "freecooling_enable": { "name": "Freecooling enabled" }
+      "freecooling_enable": { "name": "Freecooling enabled" },
+      "filter_working_hours_enabled": { "name": "Filter hour-based tracking" }
+    },
+    "button": {
+      "filter_timer_reset": { "name": "Reset filter timer" }
     },
     "number": {
       "fan_power_setpoint": { "name": "Fan power setpoint" },
       "temperature_setpoint": { "name": "Temperature setpoint" },
       "bypass_temp_threshold": { "name": "Bypass temperature threshold" },
+      "filter_max_hours": { "name": "Filter lifetime" },
       "freecooling_airflow": { "name": "Freecooling airflow" },
       "freecooling_temp_threshold": { "name": "Freecooling temperature threshold" },
       "freecooling_on_month": { "name": "Freecooling season start month" },
@@ -47,6 +52,10 @@
       "outlet_fan_power": { "name": "Outlet fan power" },
       "inlet_filter_life": { "name": "Inlet filter life" },
       "outlet_filter_life": { "name": "Outlet filter life" },
+      "filter_pressure_inlet": { "name": "Inlet filter pressure drop" },
+      "filter_pressure_outlet": { "name": "Outlet filter pressure drop" },
+      "hepa_filter_life": { "name": "HEPA filter life" },
+      "hepa_filter_pressure": { "name": "HEPA filter pressure drop" },
       "bypass_position": { "name": "Bypass position" },
       "bypass_type": {
         "name": "Bypass type",
@@ -54,6 +63,14 @@
           "none": "None",
           "stepless_0_10v": "Stepless (0-10 V)",
           "open_close": "Open/close"
+        }
+      },
+      "filter_disable_status": {
+        "name": "Filter monitoring",
+        "state": {
+          "all_active": "All active",
+          "inlet_disabled": "Inlet disabled",
+          "outlet_disabled": "Outlet disabled"
         }
       },
       "temp_sensor_selection": {

@@ -27,12 +27,15 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | switch | Power | holding 21000 | on/off |
 | switch | Freecooling mode | holding 21010 | on/off, *requests* freecooling — see below |
 | switch | Freecooling enabled | holding 20013 | on/off, config category, master enable — see below |
+| switch | Filter hour-based tracking | holding 25018 | on/off, config category — see below |
+| button | Reset filter timer | holding 21015 | press after replacing a filter — see below |
 | number | Fan power setpoint | holding 21001 | 0–100 %, raw is ‰ |
 | number | Temperature setpoint | holding 21002 | °C |
 | number | Bypass temperature threshold | holding 20036 | °C, config category |
 | number | Freecooling airflow | holding 20014 | 50–100 %, config category |
 | number | Freecooling temperature threshold | holding 20015 | °C, config category |
 | number | Freecooling season/allowed-hours (×8) | holding 20016–20023 | on/off month, day, hour, minute — config category |
+| number | Filter lifetime | holding 25019 | 200–3000 hours, config category — see below |
 | sensor | Outside → unit temperature | input 15016 | °C |
 | sensor | Unit → house temperature | input 15017 | °C |
 | sensor | House → unit temperature | input 15021 | °C |
@@ -41,6 +44,9 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | sensor | Outlet fan power | input 15013 | % |
 | sensor | Inlet filter life | input 15043 | % |
 | sensor | Outlet filter life | input 15044 | % |
+| sensor | Inlet/outlet filter pressure drop | input 15026/15027 | Pa, diagnostic — see below |
+| sensor | HEPA filter life / pressure drop | input 15046/15047 | %, Pa, diagnostic — see below |
+| sensor | Filter monitoring | holding 10162 | enum, diagnostic — which filter(s) are monitored |
 | sensor | Bypass position | input 15040 | % |
 | sensor | Bypass type | holding 10128 | enum, diagnostic |
 | sensor | Temperature sensor selection | holding 25008 | enum, diagnostic |
@@ -73,6 +79,31 @@ Check `binary_sensor.freecooling_active` (the unit's actual status, distinct
 from the request) and `binary_sensor.prefreecooling_active` (a transitional
 state before freecooling fully engages) to see what the unit is really
 doing.
+
+### Filter lifetime — when to change filters
+
+The unit tracks filter life two ways, both surfaced here:
+
+1. **Hour-based** (`switch.filter_working_hours_enabled` on): `inlet_filter_life`
+   / `outlet_filter_life` count down from 100% to 0% against
+   **`number.filter_max_hours`** (SERVICE_HARD `FilterMaxHours`, factory
+   default **1440 hours ≈ 60 days**, adjustable 200–3000 hours).
+2. **Pressure-based** (if the unit has physical filter dP sensors fitted):
+   `sensor.filter_pressure_inlet` / `filter_pressure_outlet` (Pa) reflect
+   actual clogging directly, independent of elapsed time.
+
+Either way, watch `binary_sensor.filter_change_due`,
+`filter_inlet_warning`/`filter_outlet_warning` (early warning) and
+`filter_inlet_error`/`filter_outlet_error` (overdue) for when to actually
+change them. **After physically replacing a filter, press
+`button.filter_timer_reset`** — this writes SHARE's `FilterClogedTimerReset`
+and resets the 100%/hour countdown; skipping it means the life sensors keep
+counting down from wherever they were.
+
+`sensor.filter_disable_status` tells you whether inlet, outlet, or both
+filters are actively monitored (a factory setting) — useful if one side's
+life/pressure reading looks stuck, and `hepa_filter_life` /
+`hepa_filter_pressure` are the HEPA-stage equivalents, if fitted.
 
 ### Status/error bitfields
 

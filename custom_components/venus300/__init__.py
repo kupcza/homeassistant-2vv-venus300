@@ -11,7 +11,13 @@ from .const import CONF_SLAVE_ID
 from .coordinator import Venus300Coordinator
 from .modbus_client import Venus300ModbusClient, Venus300ModbusError
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.SWITCH, Platform.NUMBER]
+PLATFORMS = [
+    Platform.BINARY_SENSOR,
+    Platform.BUTTON,
+    Platform.SENSOR,
+    Platform.SWITCH,
+    Platform.NUMBER,
+]
 
 type Venus300ConfigEntry = ConfigEntry[Venus300Coordinator]
 

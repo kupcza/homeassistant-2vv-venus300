@@ -35,6 +35,12 @@ def test_number_translation_keys_are_declared():
     assert declared <= used, declared - used
 
 
+def test_button_translation_keys_are_declared():
+    declared = set(_load_strings()["entity"]["button"])
+    used = _snake_case_literals((COMPONENT_DIR / "button.py").read_text())
+    assert declared <= used, declared - used
+
+
 def test_sensor_translation_keys_are_declared():
     declared = set(_load_strings()["entity"]["sensor"])
     used = _snake_case_literals((COMPONENT_DIR / "sensor.py").read_text())

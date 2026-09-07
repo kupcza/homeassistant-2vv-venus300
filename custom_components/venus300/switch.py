@@ -14,7 +14,13 @@ from . import Venus300ConfigEntry
 from .coordinator import Venus300Coordinator
 from .entity import Venus300Entity
 from .modbus_client import Venus300ModbusError
-from .registers import FREECOOLING_ENABLE, FREECOOLING_MODE, SWITCH_ON, Register
+from .registers import (
+    FILTER_WORKING_HOURS_ENABLED,
+    FREECOOLING_ENABLE,
+    FREECOOLING_MODE,
+    SWITCH_ON,
+    Register,
+)
 
 
 async def async_setup_entry(
@@ -33,6 +39,13 @@ async def async_setup_entry(
                 entry,
                 FREECOOLING_ENABLE,
                 "freecooling_enable",
+                EntityCategory.CONFIG,
+            ),
+            Venus300Switch(
+                coordinator,
+                entry,
+                FILTER_WORKING_HOURS_ENABLED,
+                "filter_working_hours_enabled",
                 EntityCategory.CONFIG,
             ),
         ]

@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from homeassistant.components.number import NumberEntity, NumberMode
-from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfTemperature
+from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfTemperature, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -17,6 +17,7 @@ from .modbus_client import Venus300ModbusError
 from .registers import (
     BYPASS_TEMP_THRESHOLD,
     FAN_POWER_SETPOINT,
+    FILTER_MAX_HOURS,
     FREECOOLING_AIRFLOW,
     FREECOOLING_OFF_DAY,
     FREECOOLING_OFF_HOUR,
@@ -97,6 +98,19 @@ NUMBERS = (
     Venus300NumberSpec(FREECOOLING_OFF_DAY, "freecooling_off_day", 1, 31, 1, None, EntityCategory.CONFIG),
     Venus300NumberSpec(FREECOOLING_OFF_HOUR, "freecooling_off_hour", 0, 23, 1, None, EntityCategory.CONFIG),
     Venus300NumberSpec(FREECOOLING_OFF_MIN, "freecooling_off_min", 0, 59, 1, None, EntityCategory.CONFIG),
+    # doc 25020 "FilterMaxHours": the actual configurable filter lifetime.
+    # inlet_filter_life / outlet_filter_life count down against this (when
+    # filter_working_hours_enabled is on) toward 0%, at which point replace
+    # the filters and press the "Reset filter timer" button.
+    Venus300NumberSpec(
+        FILTER_MAX_HOURS,
+        "filter_max_hours",
+        200,
+        3000,
+        10,
+        UnitOfTime.HOURS,
+        EntityCategory.CONFIG,
+    ),
 )
 
 

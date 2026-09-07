@@ -86,14 +86,26 @@ TEMP_HOUSE_TO_UNIT = Register(
 TEMP_UNIT_TO_OUTSIDE = Register(
     "temperature_unit_to_outside", 15022, RegisterKind.INPUT, signed=True, scale=0.1
 )  # doc 15023, TempINT2
+FILTER_PRESSURE_INLET = Register(
+    "filter_pressure_inlet", 15026, RegisterKind.INPUT
+)  # doc 15027, SensorFilterIn, Pa (only meaningful if a physical dP sensor is fitted)
+FILTER_PRESSURE_OUTLET = Register(
+    "filter_pressure_outlet", 15027, RegisterKind.INPUT
+)  # doc 15028, SensorFilterOut, Pa (only meaningful if a physical dP sensor is fitted)
 BYPASS_POSITION = Register("bypass_position", 15040, RegisterKind.INPUT)  # doc 15041
 INLET_FILTER_LIFE = Register("inlet_filter_life", 15043, RegisterKind.INPUT)  # doc 15044
 OUTLET_FILTER_LIFE = Register("outlet_filter_life", 15044, RegisterKind.INPUT)  # doc 15045
+HEPA_FILTER_PRESSURE = Register(
+    "hepa_filter_pressure", 15046, RegisterKind.INPUT
+)  # doc 15047, SensorFilterhEPA, Pa (only meaningful if a HEPA stage is fitted)
+HEPA_FILTER_LIFE = Register(
+    "hepa_filter_life", 15047, RegisterKind.INPUT
+)  # doc 15048, HepaFilterPercent (only meaningful if a HEPA stage is fitted)
 
 STATUS_BLOCK = ReadBlock(
     RegisterKind.INPUT,
     14999,
-    46,
+    49,
     (
         GLOBAL_STATUS_RAW,
         GLOBAL_STATUS2_RAW,
@@ -105,9 +117,13 @@ STATUS_BLOCK = ReadBlock(
         TEMP_UNIT_TO_HOUSE,
         TEMP_HOUSE_TO_UNIT,
         TEMP_UNIT_TO_OUTSIDE,
+        FILTER_PRESSURE_INLET,
+        FILTER_PRESSURE_OUTLET,
         BYPASS_POSITION,
         INLET_FILTER_LIFE,
         OUTLET_FILTER_LIFE,
+        HEPA_FILTER_PRESSURE,
+        HEPA_FILTER_LIFE,
     ),
 )
 
@@ -188,14 +204,37 @@ FREECOOLING_BLOCK = ReadBlock(
     ),
 )
 
+# ---- Filter lifetime config block (Holding Registers, SERVICE_HARD sheet) ----
+# FilterMaxHours is the actual configurable filter lifetime; the % sensors
+# (INLET_FILTER_LIFE / OUTLET_FILTER_LIFE above) count down against it (when
+# hour-based tracking is enabled) or against a pressure-sensor reading.
+# One read covers 25018..25019 (2 registers) in a single transaction.
+
+FILTER_WORKING_HOURS_ENABLED = Register(
+    "filter_working_hours_enabled", 25018, RegisterKind.HOLDING, writable=True
+)  # doc 25019, SERVICE_HARD: FilterWoringHours, hour-based tracking on/off
+FILTER_MAX_HOURS = Register(
+    "filter_max_hours", 25019, RegisterKind.HOLDING, writable=True
+)  # doc 25020, SERVICE_HARD: FilterMaxHours, lifetime in hours (200-3000)
+
+FILTER_CONFIG_BLOCK = ReadBlock(
+    RegisterKind.HOLDING, 25018, 2, (FILTER_WORKING_HOURS_ENABLED, FILTER_MAX_HOURS)
+)
+
 # ---- Isolated holding registers, each its own transaction ----
 
 FREECOOLING_MODE = Register(
     "freecooling_mode", 21010, RegisterKind.HOLDING, writable=True
 )  # doc 21011, SHARE: FreecoolingMode, manual activation request
+FILTER_CLOGGED_TIMER_RESET = Register(
+    "filter_clogged_timer_reset", 21015, RegisterKind.HOLDING, writable=True
+)  # doc 21016, SHARE: FilterClogedTimerReset — write 1 after replacing a filter
 BYPASS_TYPE_RAW = Register(
     "bypass_type_raw", 10128, RegisterKind.HOLDING
 )  # doc 10129, FACTORY_SET: Bypass
+FILTER_DISABLE_STATUS_RAW = Register(
+    "filter_disable_status_raw", 10162, RegisterKind.HOLDING
+)  # doc 10163, FACTORY_SET: FilterDisableStatus
 BYPASS_TEMP_THRESHOLD = Register(
     "bypass_temp_threshold", 20036, RegisterKind.HOLDING, writable=True
 )  # doc 20037, SERVICE: BypassTemperature
@@ -209,12 +248,13 @@ TEMP_SENSOR_SELECTION_RAW = Register(
 SINGLE_HOLDING_REGISTERS = (
     FREECOOLING_MODE,
     BYPASS_TYPE_RAW,
+    FILTER_DISABLE_STATUS_RAW,
     BYPASS_TEMP_THRESHOLD,
     VENTILATION_MODE_RAW,
     TEMP_SENSOR_SELECTION_RAW,
 )
 
-ALL_BLOCKS = (STATUS_BLOCK, PORT_BLOCK, CONTROL_BLOCK, FREECOOLING_BLOCK)
+ALL_BLOCKS = (STATUS_BLOCK, PORT_BLOCK, CONTROL_BLOCK, FREECOOLING_BLOCK, FILTER_CONFIG_BLOCK)
 
 # ---- Enum decodings for read-only raw registers ----
 # Bit-level meanings of GLOBAL_STATUS_RAW / GLOBAL_STATUS2_RAW / SW_ERROR1_RAW
@@ -223,6 +263,7 @@ ALL_BLOCKS = (STATUS_BLOCK, PORT_BLOCK, CONTROL_BLOCK, FREECOOLING_BLOCK)
 # kept as diagnostic sensors below for troubleshooting.
 
 BYPASS_TYPE_OPTIONS = {0: "none", 1: "stepless_0_10v", 2: "open_close"}
+FILTER_DISABLE_STATUS_OPTIONS = {0: "all_active", 1: "inlet_disabled", 2: "outlet_disabled"}
 TEMP_SENSOR_SELECTION_OPTIONS = {0: "supply_duct", 1: "extract_duct", 2: "room"}
 VENTILATION_MODE_OPTIONS = {
     0: "manual",
