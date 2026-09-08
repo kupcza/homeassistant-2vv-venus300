@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract this version's changelog section
+        id: notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          python3 - "$version" <<'EOF' > /tmp/notes.md
+          import re
+          import sys
+
+          version = sys.argv[1]
+          text = open("CHANGELOG.md").read()
+          match = re.search(
+              rf"^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## \[|\Z)",
+              text,
+              flags=re.MULTILINE | re.DOTALL,
+          )
+          print(match.group(1).strip() if match else f"See CHANGELOG.md for v{version}.")
+          EOF
+      - name: Create GitHub Release
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file /tmp/notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}

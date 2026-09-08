@@ -248,6 +248,9 @@ instance); CI runs them on every push/PR via `.github/workflows/test.yml`.
 ## Versioning
 
 This project follows [Semantic Versioning](https://semver.org/). Every
-release bumps `custom_components/venus300/manifest.json`'s `version` and
-gets a matching, changelog-entry in [CHANGELOG.md](CHANGELOG.md) and a
-`vX.Y.Z` git tag — this is what HACS uses to offer updates.
+release bumps `custom_components/venus300/manifest.json`'s `version`, gets
+a matching entry in [CHANGELOG.md](CHANGELOG.md), and is tagged `vX.Y.Z`.
+Pushing that tag triggers `.github/workflows/release.yml`, which publishes
+a **GitHub Release** for it (extracting that version's CHANGELOG section as
+the release notes) — HACS checks for **Releases**, not just tags, to offer
+updates, so this step is required, not cosmetic.
