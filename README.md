@@ -108,6 +108,17 @@ otherwise (turn the switch on and back off to force it off explicitly).
 `binary_sensor.boost_mode_active` (from the unit's own status word) always
 reflects the unit's real state regardless of any of this.
 
+**Restoring state after boost ends:** the datasheet documents a separate
+`BoostFlow` airflow setting distinct from `fan_power_setpoint`, which
+suggests the unit resumes its prior fan speed/power on its own once
+`BoostMode` returns to 0 — but this isn't explicitly confirmed. As a safety
+net, `switch.power` and `number.fan_power_setpoint` are snapshotted right
+before boost activates and explicitly written back when it ends (by timer
+or manual turn-off), regardless of what the unit does internally. One
+consequence: if you manually change power or fan speed *while* a boost is
+running, that change gets overwritten by the pre-boost snapshot once boost
+ends — this is intentional, matching "return to original state after."
+
 ### Filter lifetime — when to change filters
 
 The unit tracks filter life two ways, both surfaced here:

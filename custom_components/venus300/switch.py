@@ -19,11 +19,13 @@ from .entity import Venus300Entity
 from .modbus_client import Venus300ModbusError
 from .registers import (
     BOOST_MODE,
+    FAN_POWER_SETPOINT,
     FILTER_WORKING_HOURS_ENABLED,
     FREECOOLING_ENABLE,
     FREECOOLING_MODE,
     SWITCH_ON,
     Register,
+    encode_value,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -107,9 +109,17 @@ class Venus300BoostSwitch(Venus300Entity, SwitchEntity):
     turn-off after coordinator.boost_timer_minutes (number.boost_timer_minutes)
     — simulating a "boost button" without needing an external Home Assistant
     automation to manage the countdown. Turning it off manually cancels the
-    countdown immediately. State isn't restored across Home Assistant
-    restarts: a boost in progress at restart time comes back "off" here,
-    though the unit itself keeps running boost until it's told otherwise.
+    countdown immediately.
+
+    As a safety net (the datasheet doesn't confirm the unit restores its own
+    prior fan speed/power state once BoostMode returns to 0 — it has its own,
+    separate BoostFlow airflow setting, so it likely does, but this isn't
+    confirmed), power and fan_power_setpoint are snapshotted right before
+    activating boost and explicitly written back when boost ends, whether by
+    the timer or a manual turn-off. State isn't restored across Home
+    Assistant restarts: a boost in progress at restart time comes back "off"
+    here, with no snapshot to restore, though the unit itself keeps running
+    boost until it's told otherwise.
     """
 
     _attr_translation_key = "boost_active"
@@ -120,6 +130,7 @@ class Venus300BoostSwitch(Venus300Entity, SwitchEntity):
         self._attr_unique_id = f"{entry.entry_id}_boost_active"
         self._attr_is_on = False
         self._cancel_timer: Callable[[], None] | None = None
+        self._pre_boost_state: dict[str, Any] | None = None
 
     @property
     def is_on(self) -> bool:
@@ -127,16 +138,21 @@ class Venus300BoostSwitch(Venus300Entity, SwitchEntity):
         return self._attr_is_on
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        """Activate boost on the unit and schedule its automatic turn-off."""
+        """Snapshot the current state, activate boost, schedule its auto-off."""
+        self._pre_boost_state = {
+            SWITCH_ON.key: self.coordinator.data.get(SWITCH_ON.key),
+            FAN_POWER_SETPOINT.key: self.coordinator.data.get(FAN_POWER_SETPOINT.key),
+        }
         await self._async_write(1)
         self._attr_is_on = True
         self._schedule_auto_off()
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        """Deactivate boost on the unit immediately."""
+        """Deactivate boost immediately and restore the pre-boost state."""
         self._cancel_pending_timer()
         await self._async_write(0)
+        await self._async_restore_pre_boost_state()
         self._attr_is_on = False
         self.async_write_ha_state()
 
@@ -157,15 +173,34 @@ class Venus300BoostSwitch(Venus300Entity, SwitchEntity):
             self._cancel_timer = None
 
     async def _async_auto_off(self, _now: Any) -> None:
-        """Turn boost back off once the configured duration has elapsed."""
+        """Turn boost back off and restore prior state once time's up."""
         self._cancel_timer = None
         try:
             await self.coordinator.client.write_register(BOOST_MODE, 0)
         except Venus300ModbusError as err:
             _LOGGER.error("Failed to auto turn off boost: %s", err)
+        else:
+            await self._async_restore_pre_boost_state()
         self._attr_is_on = False
         self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
+
+    async def _async_restore_pre_boost_state(self) -> None:
+        """Write back power/fan speed as they were just before boost started."""
+        if self._pre_boost_state is None:
+            return
+        snapshot, self._pre_boost_state = self._pre_boost_state, None
+        try:
+            for register, value in (
+                (SWITCH_ON, snapshot.get(SWITCH_ON.key)),
+                (FAN_POWER_SETPOINT, snapshot.get(FAN_POWER_SETPOINT.key)),
+            ):
+                if value is not None:
+                    await self.coordinator.client.write_register(
+                        register, encode_value(register, value)
+                    )
+        except Venus300ModbusError as err:
+            _LOGGER.error("Failed to restore pre-boost state: %s", err)
 
     async def _async_write(self, value: int) -> None:
         """Write the boost register and refresh state from the unit."""

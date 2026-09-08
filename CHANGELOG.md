@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] - 2026-09-08
+
+### Added
+
+- `switch.boost_active` now snapshots `switch.power` and
+  `number.fan_power_setpoint` right before activating boost, and
+  explicitly restores them when boost ends (by timer or manual
+  turn-off) — a safety net in case the unit doesn't fully resume its
+  prior state on its own once `BoostMode` returns to 0. Added
+  `tests/test_boost_switch.py` covering the snapshot/write/restore logic.
+
 ## [0.4.0] - 2026-09-08
 
 ### Added
