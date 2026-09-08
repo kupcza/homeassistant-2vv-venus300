@@ -111,17 +111,25 @@ filters are actively monitored (a factory setting) — useful if one side's
 life/pressure reading looks stuck, and `hepa_filter_life` /
 `hepa_filter_pressure` are the HEPA-stage equivalents, if fitted.
 
-**Reading stuck at 0% on a filter you know is fresh?** The datasheet
-doesn't state whether `inlet_filter_life`/`outlet_filter_life` count up
-(usage/clogging) or down (remaining life) — that's still unconfirmed here.
-Either way, if `filter_working_hours_enabled` is **off**, the register isn't
-being driven by elapsed hours against `filter_max_hours` at all — it then
-depends entirely on a physical differential-pressure sensor, which reads
-near-zero on a genuinely clean filter (expected) or may not be fitted at
-all (stuck at 0% forever, not a bug — check `filter_pressure_inlet`/
-`filter_pressure_outlet`: non-zero and moving means a real sensor is
-driving it). Turn `filter_working_hours_enabled` **on** to get hour-based
-tracking against `filter_max_hours` instead.
+**Known caveat — `%` life stuck at 0% with no physical dP sensor fitted:**
+observed on a real unit with `filter_working_hours_enabled` on continuously
+since a filter change, `filter_max_hours` set, and both
+`filter_pressure_inlet`/`filter_pressure_outlet` reading 0 (no physical
+differential-pressure sensor fitted) — `inlet_filter_life`/
+`outlet_filter_life` stayed at 0% for weeks regardless. This suggests the
+`%` registers are sourced from the (unfitted) pressure sensor on this
+firmware, independent of the hour-based tracking enable/threshold, which
+instead appears to drive `binary_sensor.filter_inlet_warning`/
+`filter_outlet_warning`/`filter_change_due` directly.
+
+**If your unit has no physical filter dP sensor** (check
+`filter_pressure_inlet`/`filter_pressure_outlet` — near-zero and never
+moving means no sensor), don't rely on the `%` sensors for "when to
+change"; watch the warning/error binary sensors instead — they appear to
+reflect the hour-based comparison correctly even when the percentage
+doesn't. This hasn't been confirmed against 2VV's firmware source, only
+observed behavior — if you find out more (or your unit does have working
+`%`), a PR/issue updating this note is welcome.
 
 ### Status/error bitfields
 

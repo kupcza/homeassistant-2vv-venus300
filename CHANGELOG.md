@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.4] - 2026-09-08
+
+### Documentation
+
+- README: documented an observed real-world caveat — on a unit with no
+  physical filter differential-pressure sensor fitted,
+  `inlet_filter_life`/`outlet_filter_life` stay at 0% indefinitely even
+  with `filter_working_hours_enabled` on and `filter_max_hours` set,
+  regardless of elapsed time. The hour-based comparison appears to still
+  correctly drive `filter_inlet_warning`/`filter_outlet_warning`/
+  `filter_change_due`, so those are the reliable "time to change" signal
+  on such units. Unconfirmed against firmware source — observed behavior
+  only.
+
 ## [0.2.3] - 2026-09-08
 
 ### Fixed
