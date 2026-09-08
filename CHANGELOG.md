@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.3] - 2026-09-08
+
+### Fixed
+
+- `number.filter_max_hours` range widened from the datasheet's "typical"
+  200–3000 to the register's actual limits (0–65535): a real unit was
+  observed configured to 5000, outside the old bound.
+
+### Documentation
+
+- README: added troubleshooting guidance for `inlet_filter_life`/
+  `outlet_filter_life` reading stuck at 0% shortly after a filter change —
+  check `filter_working_hours_enabled` and `filter_pressure_inlet`/
+  `filter_pressure_outlet` to tell hour-based tracking apart from an
+  unfitted/idle pressure sensor. Also flagged that the direction of the
+  life/usage percentage (counts up vs. down) isn't confirmed by the
+  datasheet.
+
 ## [0.2.2] - 2026-09-08
 
 ### Changed

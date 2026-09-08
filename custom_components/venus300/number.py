@@ -102,11 +102,16 @@ NUMBERS = (
     # inlet_filter_life / outlet_filter_life count down against this (when
     # filter_working_hours_enabled is on) toward 0%, at which point replace
     # the filters and press the "Reset filter timer" button.
+    #
+    # The datasheet lists 200-3000 as the "typical" range, but the register
+    # is a plain uint16 and real units have been seen configured well above
+    # that (e.g. 5000) — so the bound here is the register's actual limit,
+    # not the datasheet's suggestion, to avoid ever rejecting a real value.
     Venus300NumberSpec(
         FILTER_MAX_HOURS,
         "filter_max_hours",
-        200,
-        3000,
+        0,
+        65535,
         10,
         UnitOfTime.HOURS,
         EntityCategory.CONFIG,

@@ -89,9 +89,11 @@ doing.
 The unit tracks filter life two ways, both surfaced here:
 
 1. **Hour-based** (`switch.filter_working_hours_enabled` on): `inlet_filter_life`
-   / `outlet_filter_life` count down from 100% to 0% against
-   **`number.filter_max_hours`** (SERVICE_HARD `FilterMaxHours`, factory
-   default **1440 hours ≈ 60 days**, adjustable 200–3000 hours).
+   / `outlet_filter_life` move against **`number.filter_max_hours`**
+   (SERVICE_HARD `FilterMaxHours`, factory default 1440 hours ≈ 60 days —
+   the datasheet lists 200–3000 as "typical", but it's a plain register and
+   real units have been seen configured well outside that, so the number
+   entity's range isn't clamped to it).
 2. **Pressure-based** (if the unit has physical filter dP sensors fitted):
    `sensor.filter_pressure_inlet` / `filter_pressure_outlet` (Pa) reflect
    actual clogging directly, independent of elapsed time.
@@ -101,13 +103,25 @@ Either way, watch `binary_sensor.filter_change_due`,
 `filter_inlet_error`/`filter_outlet_error` (overdue) for when to actually
 change them. **After physically replacing a filter, press
 `button.filter_timer_reset`** — this writes SHARE's `FilterClogedTimerReset`
-and resets the 100%/hour countdown; skipping it means the life sensors keep
-counting down from wherever they were.
+and resets the countdown; skipping it means the life sensors keep counting
+from wherever they were.
 
 `sensor.filter_disable_status` tells you whether inlet, outlet, or both
 filters are actively monitored (a factory setting) — useful if one side's
 life/pressure reading looks stuck, and `hepa_filter_life` /
 `hepa_filter_pressure` are the HEPA-stage equivalents, if fitted.
+
+**Reading stuck at 0% on a filter you know is fresh?** The datasheet
+doesn't state whether `inlet_filter_life`/`outlet_filter_life` count up
+(usage/clogging) or down (remaining life) — that's still unconfirmed here.
+Either way, if `filter_working_hours_enabled` is **off**, the register isn't
+being driven by elapsed hours against `filter_max_hours` at all — it then
+depends entirely on a physical differential-pressure sensor, which reads
+near-zero on a genuinely clean filter (expected) or may not be fitted at
+all (stuck at 0% forever, not a bug — check `filter_pressure_inlet`/
+`filter_pressure_outlet`: non-zero and moving means a real sensor is
+driving it). Turn `filter_working_hours_enabled` **on** to get hour-based
+tracking against `filter_max_hours` instead.
 
 ### Status/error bitfields
 
