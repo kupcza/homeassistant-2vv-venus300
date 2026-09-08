@@ -193,6 +193,18 @@ add the relevant `BitSensorSpec` entries in `bitfields.py`.
 Copy `custom_components/venus300` into your Home Assistant `config/custom_components/`
 directory and restart.
 
+### Known limitation: no icon in the HACS repository list
+
+This integration ships a brand icon the modern way (`custom_components/venus300/brand/icon.png`,
+served by Home Assistant's own [Brands Proxy API](https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api)
+since HA 2026.3), which is why `hacs/action` validation passes. HACS's own
+dashboard, however, still only fetches icons from the older central
+`brands.home-assistant.io` CDN and doesn't yet know about that mechanism —
+a currently open upstream bug
+([hacs/integration#5223](https://github.com/hacs/integration/issues/5223),
+fix in progress at [hacs/frontend#937](https://github.com/hacs/frontend/pull/937)).
+Nothing to fix here; it'll start showing once HACS ships that update.
+
 ## Configuration
 
 Settings → Devices & Services → Add Integration → **2VV Venus 300**
