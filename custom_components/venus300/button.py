@@ -28,8 +28,10 @@ async def async_setup_entry(
 class Venus300FilterTimerResetButton(Venus300Entity, ButtonEntity):
     """Reset the filter clog timer/counter after replacing a filter.
 
-    Writes SHARE's FilterClogedTimerReset (doc 21016): this is a one-shot
-    action, not a persistent state, so it isn't tracked by the coordinator.
+    Writes SHARE's FilterClogedTimerReset (doc 21016) and zeroes the
+    Home-Assistant-side usage tracker (filter_usage.py) that estimates
+    filter_usage_hours/filter_usage_percent independently of the unit's own
+    (sometimes non-functional — see README) percentage registers.
     """
 
     _attr_translation_key = "filter_timer_reset"
@@ -46,4 +48,5 @@ class Venus300FilterTimerResetButton(Venus300Entity, ButtonEntity):
             await self.coordinator.client.write_register(FILTER_CLOGGED_TIMER_RESET, 1)
         except Venus300ModbusError as err:
             raise HomeAssistantError(str(err)) from err
+        await self.coordinator.filter_usage.async_reset()
         await self.coordinator.async_request_refresh()

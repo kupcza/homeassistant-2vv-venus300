@@ -51,6 +51,9 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | sensor | Inlet/outlet filter pressure drop | input 15026/15027 | Pa, diagnostic — see below |
 | sensor | HEPA filter life / pressure drop | input 15046/15047 | %, Pa, diagnostic — see below |
 | sensor | Filter monitoring | holding 10162 | enum, diagnostic — which filter(s) are monitored |
+| sensor | Filter usage (estimated) | *(computed in HA)* | hours since last reset — see below |
+| sensor | Filter usage % (estimated) | *(computed in HA)* | % of `filter_max_hours` — see below |
+| sensor | Filter usage last reset | *(computed in HA)* | timestamp, diagnostic |
 | sensor | Bypass position | input 15040 | % |
 | sensor | Bypass type | holding 10128 | enum, diagnostic |
 | sensor | Temperature sensor selection | holding 25008 | enum, diagnostic |
@@ -130,6 +133,28 @@ reflect the hour-based comparison correctly even when the percentage
 doesn't. This hasn't been confirmed against 2VV's firmware source, only
 observed behavior — if you find out more (or your unit does have working
 `%`), a PR/issue updating this note is welcome.
+
+### Filter usage tracked independently in Home Assistant
+
+Because the unit's own `%` can be permanently stuck at 0% (above), this
+integration also tracks estimated filter usage **itself**, independent of
+the unit's internal logic:
+
+- `sensor.filter_usage_hours` — hours accumulated since the last reset,
+  counted only while `switch.power` is on (matching what "filter **working**
+  hours" means) — polled and accumulated every update, persisted across
+  Home Assistant restarts.
+- `sensor.filter_usage_percent` — `filter_usage_hours` ÷ the live
+  `number.filter_max_hours` value read from the unit, as a percentage.
+- `sensor.filter_usage_reset_at` — when the tracker was last reset
+  (diagnostic).
+
+**Pressing `button.filter_timer_reset` resets both**: the unit's own
+`FilterClogedTimerReset` register *and* this Home-Assistant-side tracker.
+This is why it matters to use the HA button rather than the unit's own
+control-panel reset from now on — **if you reset a filter via the unit's
+physical display instead, this tracker has no way to know and will keep
+counting past the real reset point.**
 
 ### Status/error bitfields
 

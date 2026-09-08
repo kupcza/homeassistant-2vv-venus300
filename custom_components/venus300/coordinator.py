@@ -10,8 +10,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DEFAULT_SCAN_INTERVAL
+from .filter_usage import FilterUsageTracker
 from .modbus_client import Venus300ModbusClient, Venus300ModbusError
-from .registers import ALL_BLOCKS, SINGLE_HOLDING_REGISTERS
+from .registers import ALL_BLOCKS, FILTER_MAX_HOURS, SINGLE_HOLDING_REGISTERS, SWITCH_ON
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class Venus300Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             update_interval=DEFAULT_SCAN_INTERVAL,
         )
         self.client = client
+        self.filter_usage = FilterUsageTracker(hass, entry.entry_id)
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Poll every register block and isolated register."""
@@ -44,4 +46,13 @@ class Venus300Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 data[register.key] = await self.client.read_register(register)
         except Venus300ModbusError as err:
             raise UpdateFailed(str(err)) from err
+
+        usage_hours = await self.filter_usage.async_tick(running=bool(data[SWITCH_ON.key]))
+        data["filter_usage_hours"] = round(usage_hours, 2)
+        max_hours = data.get(FILTER_MAX_HOURS.key)
+        data["filter_usage_percent"] = (
+            round(min(100.0, usage_hours / max_hours * 100), 1) if max_hours else None
+        )
+        data["filter_usage_reset_at"] = self.filter_usage.last_reset_at
+
         return data

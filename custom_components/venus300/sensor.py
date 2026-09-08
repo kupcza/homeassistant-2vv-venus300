@@ -9,7 +9,13 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfPressure, UnitOfTemperature
+from homeassistant.const import (
+    EntityCategory,
+    PERCENTAGE,
+    UnitOfPressure,
+    UnitOfTemperature,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -157,7 +163,13 @@ async def async_setup_entry(
 ) -> None:
     """Set up the Venus 300 sensors."""
     coordinator = entry.runtime_data
-    async_add_entities(Venus300Sensor(coordinator, entry, spec) for spec in SENSORS)
+    entities: list[SensorEntity] = [
+        Venus300Sensor(coordinator, entry, spec) for spec in SENSORS
+    ]
+    entities.append(Venus300FilterUsageHoursSensor(coordinator, entry))
+    entities.append(Venus300FilterUsagePercentSensor(coordinator, entry))
+    entities.append(Venus300FilterUsageResetAtSensor(coordinator, entry))
+    async_add_entities(entities)
 
 
 class Venus300Sensor(Venus300Entity, SensorEntity):
@@ -191,3 +203,62 @@ class Venus300Sensor(Venus300Entity, SensorEntity):
         if self._spec.options:
             return self._spec.options.get(int(raw))
         return raw
+
+
+class Venus300FilterUsageHoursSensor(Venus300Entity, SensorEntity):
+    """Operating hours accumulated in Home Assistant since the last reset.
+
+    See filter_usage.py: independent of the unit's own (sometimes
+    non-functional) inlet_filter_life/outlet_filter_life percentage.
+    """
+
+    _attr_translation_key = "filter_usage_hours"
+    _attr_native_unit_of_measurement = UnitOfTime.HOURS
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_suggested_display_precision = 1
+
+    def __init__(self, coordinator: Venus300Coordinator, entry: Venus300ConfigEntry) -> None:
+        """Set up the sensor."""
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_filter_usage_hours"
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the accumulated hours."""
+        return self.coordinator.data.get("filter_usage_hours")
+
+
+class Venus300FilterUsagePercentSensor(Venus300Entity, SensorEntity):
+    """Estimated filter usage: accumulated hours vs. filter_max_hours."""
+
+    _attr_translation_key = "filter_usage_percent"
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, coordinator: Venus300Coordinator, entry: Venus300ConfigEntry) -> None:
+        """Set up the sensor."""
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_filter_usage_percent"
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the estimated usage percentage."""
+        return self.coordinator.data.get("filter_usage_percent")
+
+
+class Venus300FilterUsageResetAtSensor(Venus300Entity, SensorEntity):
+    """When the Home-Assistant-side filter usage tracker was last reset."""
+
+    _attr_translation_key = "filter_usage_reset_at"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    def __init__(self, coordinator: Venus300Coordinator, entry: Venus300ConfigEntry) -> None:
+        """Set up the sensor."""
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_filter_usage_reset_at"
+
+    @property
+    def native_value(self):
+        """Return the last-reset timestamp."""
+        return self.coordinator.data.get("filter_usage_reset_at")

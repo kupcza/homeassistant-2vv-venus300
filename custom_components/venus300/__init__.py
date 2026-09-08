@@ -34,6 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: Venus300ConfigEntry) -> 
         raise ConfigEntryNotReady(str(err)) from err
 
     coordinator = Venus300Coordinator(hass, entry, client)
+    await coordinator.filter_usage.async_load()
     await coordinator.async_config_entry_first_refresh()
 
     entry.runtime_data = coordinator

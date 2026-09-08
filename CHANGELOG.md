@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-09-08
+
+### Added
+
+- Home-Assistant-side filter usage tracking (`filter_usage.py`),
+  independent of the unit's own (sometimes non-functional — see the 0.2.4
+  caveat) `%` registers:
+  - `sensor.filter_usage_hours` — hours accumulated since the last reset,
+    counted only while the unit is powered on, persisted across Home
+    Assistant restarts.
+  - `sensor.filter_usage_percent` — `filter_usage_hours` against the live
+    `filter_max_hours` value read from the unit.
+  - `sensor.filter_usage_reset_at` — diagnostic timestamp of the last
+    reset.
+  - `button.filter_timer_reset` now resets both the unit's own register
+    and this tracker. Resetting via the unit's own control panel instead
+    does not reset the Home Assistant side.
+
 ## [0.2.4] - 2026-09-08
 
 ### Documentation
