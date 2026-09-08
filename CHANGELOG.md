@@ -5,6 +5,14 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.2] - 2026-09-08
+
+### Changed
+
+- Renamed the filter-reset button's display name from "Reset filter timer"
+  to "Reset filter usage hours" for clarity. Entity ID/unique ID unchanged
+  (`button.filter_timer_reset`), so nothing breaks for existing installs.
+
 ## [0.2.1] - 2026-09-07
 
 ### Fixed

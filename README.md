@@ -32,7 +32,7 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | switch | Freecooling mode | holding 21010 | on/off, *requests* freecooling — see below |
 | switch | Freecooling enabled | holding 20013 | on/off, config category, master enable — see below |
 | switch | Filter hour-based tracking | holding 25018 | on/off, config category — see below |
-| button | Reset filter timer | holding 21015 | press after replacing a filter — see below |
+| button | Reset filter usage hours | holding 21015 | press after replacing a filter — see below |
 | number | Fan power setpoint | holding 21001 | 0–100 %, raw is ‰ |
 | number | Temperature setpoint | holding 21002 | °C |
 | number | Bypass temperature threshold | holding 20036 | °C, config category |

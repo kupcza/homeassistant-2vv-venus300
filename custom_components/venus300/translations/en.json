@@ -25,7 +25,7 @@
       "filter_working_hours_enabled": { "name": "Filter hour-based tracking" }
     },
     "button": {
-      "filter_timer_reset": { "name": "Reset filter timer" }
+      "filter_timer_reset": { "name": "Reset filter usage hours" }
     },
     "number": {
       "fan_power_setpoint": { "name": "Fan power setpoint" },
