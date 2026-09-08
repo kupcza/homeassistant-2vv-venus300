@@ -5,6 +5,22 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-09-08
+
+### Added
+
+- `number.boost_timer`: exposes the unit's **own** `BoostTimer` register
+  (SERVICE, doc 20012, 1–60 min, default 3) — previously undiscovered.
+  Unlike `number.boost_timer_minutes` (which only times out
+  `switch.boost_active`'s Home-Assistant-managed activation), this governs
+  boost duration for *every* trigger source: the physical wired boost
+  switch (`Status_DI_5_Boost`), the control panel, and Modbus. The two are
+  intentionally independent — see the README for which one to adjust for
+  what.
+- Renamed the two boost-duration entities' display names to
+  "Boost duration (HA switch only)" / "Boost duration (unit, all
+  triggers)" to make the distinction unmistakable in the UI.
+
 ## [0.4.1] - 2026-09-08
 
 ### Added

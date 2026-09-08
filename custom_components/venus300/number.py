@@ -16,6 +16,7 @@ from .coordinator import Venus300Coordinator
 from .entity import Venus300Entity
 from .modbus_client import Venus300ModbusError
 from .registers import (
+    BOOST_TIMER,
     BYPASS_TEMP_THRESHOLD,
     FAN_POWER_SETPOINT,
     FILTER_MAX_HOURS,
@@ -49,6 +50,13 @@ class Venus300NumberSpec:
 
 
 NUMBERS = (
+    # doc 20012 "BoostTimer": the UNIT's own boost auto-off duration —
+    # applies no matter what activates boost (physical DI-5 switch, control
+    # panel, or Modbus), unlike number.boost_timer_minutes below, which only
+    # times out switch.boost_active's own Home-Assistant-managed activation.
+    Venus300NumberSpec(
+        BOOST_TIMER, "boost_timer", 1, 60, 1, UnitOfTime.MINUTES, EntityCategory.CONFIG
+    ),
     # doc 21002 "AirFlowManual": only meaningful while ventilation_mode is
     # Manual (SERVICE_HARD 25000); the unit itself computes airflow in
     # DCV/CAV/VAV/VAVC4/PCO modes.

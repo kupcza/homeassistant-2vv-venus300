@@ -145,12 +145,22 @@ CONTROL_BLOCK = ReadBlock(
     RegisterKind.HOLDING, 21000, 3, (SWITCH_ON, FAN_POWER_SETPOINT, TEMPERATURE_SETPOINT)
 )
 
-# ---- Freecooling config block (Holding Registers, SERVICE sheet) ----
+# ---- Freecooling + Boost timer config block (Holding Registers, SERVICE) ----
 # SHARE's FreecoolingMode (below) only *requests* freecooling. Whether the
 # unit actually engages it also depends on this block: a master enable, an
 # outdoor-temperature threshold, and a daily/seasonal allowed-hours window.
-# One read covers 20013..20023 (11 registers) in a single transaction.
+# BoostTimer happens to sit immediately before these on the SERVICE sheet,
+# so it's fetched in the same transaction; it's otherwise unrelated to
+# freecooling — see its own comment below.
+# One read covers 20011..20023 (13 registers) in a single transaction.
 
+BOOST_TIMER = Register(
+    "boost_timer", 20011, RegisterKind.HOLDING, writable=True
+)  # doc 20012, SERVICE: BoostTimer (minutes) — the UNIT's own boost
+# auto-off duration, applied no matter what activates boost: the physical
+# DI-5 wired switch, the control panel, or Modbus. Distinct from
+# number.boost_timer_minutes (switch.py), which only times out
+# switch.boost_active's own Home-Assistant-managed activation.
 FREECOOLING_ENABLE = Register(
     "freecooling_enable", 20013, RegisterKind.HOLDING, writable=True
 )  # doc 20014, SERVICE: FreecoolingEnable, master enable for freecooling
@@ -187,9 +197,10 @@ FREECOOLING_OFF_MIN = Register(
 
 FREECOOLING_BLOCK = ReadBlock(
     RegisterKind.HOLDING,
-    20013,
-    11,
+    20011,
+    13,
     (
+        BOOST_TIMER,
         FREECOOLING_ENABLE,
         FREECOOLING_AIRFLOW,
         FREECOOLING_TEMP_THRESHOLD,

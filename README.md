@@ -35,7 +35,8 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | switch | Boost | holding 21008 | on/off, self-clearing timer — see below |
 | button | Reset filter usage hours | holding 21015 | press after replacing a filter — see below |
 | number | Fan power setpoint | holding 21001 | 0–100 %, raw is ‰ |
-| number | Boost duration | *(computed in HA)* | 1–60 minutes, default 5, config category — see below |
+| number | Boost duration (HA switch only) | *(computed in HA)* | 1–60 min, default 5, config category — see below |
+| number | Boost duration (unit, all triggers) | holding 20011 | 1–60 min, default 3, config category — see below |
 | number | Temperature setpoint | holding 21002 | °C |
 | number | Bypass temperature threshold | holding 20036 | °C, config category |
 | number | Freecooling airflow | holding 20014 | 50–100 %, config category |
@@ -89,7 +90,7 @@ from the request) and `binary_sensor.prefreecooling_active` (a transitional
 state before freecooling fully engages) to see what the unit is really
 doing.
 
-### Self-clearing Boost switch
+### Self-clearing Boost switch — two different timers, on purpose
 
 `switch.boost_active` writes SHARE's `BoostMode` (doc 21009) directly to
 activate the unit's own boost airflow — but unlike the other switches, it's
@@ -99,6 +100,21 @@ Assistant-side setting with no Modbus register of its own). This simulates
 a physical "boost button" without needing an external Home Assistant
 automation to manage the countdown — trigger it from a dashboard button,
 a voice command, or any automation, and it clears itself.
+
+**This is deliberately separate from `number.boost_timer`**, which writes
+the unit's *own* `BoostTimer` register (SERVICE, doc 20012, default **3
+minutes**). The unit has a physical wired input for boost (`Status_DI_5_Boost`
+in its status word — e.g. a wall switch, wired independently of Home
+Assistant) and presumably a control-panel trigger too; both use the unit's
+own `BoostTimer` to decide how long boost runs, entirely outside Home
+Assistant's knowledge or control.
+
+So: **`number.boost_timer_minutes` only affects `switch.boost_active`**
+(the HA-managed one). **`number.boost_timer` affects every other way of
+triggering boost** — the physical switch, the control panel — since it's
+the unit's own setting. Changing one does not change the other. If you want
+a physical boost button in the house to run for a different duration,
+adjust `number.boost_timer`, not `number.boost_timer_minutes`.
 
 Turning it off manually before time's up cancels the countdown and
 deactivates boost immediately. Note: the countdown itself isn't restored
