@@ -2,6 +2,10 @@
 
 [![Validate](https://github.com/kupcza/homeassistant-2vv-venus300/actions/workflows/validate.yml/badge.svg)](https://github.com/kupcza/homeassistant-2vv-venus300/actions/workflows/validate.yml)
 [![Tests](https://github.com/kupcza/homeassistant-2vv-venus300/actions/workflows/test.yml/badge.svg)](https://github.com/kupcza/homeassistant-2vv-venus300/actions/workflows/test.yml)
+[![GitHub tag](https://img.shields.io/github/v/tag/kupcza/homeassistant-2vv-venus300)](https://github.com/kupcza/homeassistant-2vv-venus300/tags)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kupcza&repository=homeassistant-2vv-venus300&category=integration)
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=venus300)
 
 A HACS-installable Home Assistant integration for the **2VV Venus 300** heat
 recovery ventilation unit (AirGenio control), talking **Modbus TCP** directly
@@ -126,21 +130,26 @@ add the relevant `BitSensorSpec` entries in `bitfields.py`.
 
 ## Installation
 
-### Via HACS (custom repository)
+### One click, if your browser is paired with `my.home-assistant.io`
+
+1. [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=kupcza&repository=homeassistant-2vv-venus300&category=integration) — adds this as a HACS custom repository. Click **Download** on the page it opens, then restart Home Assistant.
+2. [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=venus300) — starts the config flow (see [Configuration](#configuration) below for what it asks).
+
+### Via HACS (custom repository), manually
 
 1. HACS → Integrations → ⋮ → Custom repositories.
 2. Add `https://github.com/kupcza/homeassistant-2vv-venus300`, category **Integration**.
 3. Install "2VV Venus 300", restart Home Assistant.
 
-### Manual
+### Manual, without HACS
 
 Copy `custom_components/venus300` into your Home Assistant `config/custom_components/`
 directory and restart.
 
 ## Configuration
 
-Settings → Devices & Services → Add Integration → **2VV Venus 300**.
-You'll be asked for:
+Settings → Devices & Services → Add Integration → **2VV Venus 300**
+(or use the config-flow badge above). You'll be asked for:
 
 - **Host** — the AirGenio unit's IP address.
 - **Port** — Modbus TCP port (default `502`).
