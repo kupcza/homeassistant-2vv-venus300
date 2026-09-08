@@ -34,7 +34,7 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | switch | Filter hour-based tracking | holding 25018 | on/off, config category — see below |
 | switch | Boost | holding 21008 | on/off, self-clearing timer — see below |
 | button | Reset filter usage hours | holding 21015 | press after replacing a filter — see below |
-| number | Fan power setpoint | holding 21001 | 0–100 %, raw is ‰ |
+| number | Fan power setpoint | holding 21001 | 20–100 %, step 10, raw is ‰ — "off" is `switch.power` |
 | number | Boost duration (HA switch only) | *(computed in HA)* | 1–60 min, default 5, config category — see below |
 | number | Boost duration (unit, all triggers) | holding 20011 | 1–60 min, default 3, config category — see below |
 | number | Temperature setpoint | holding 21002 | °C |

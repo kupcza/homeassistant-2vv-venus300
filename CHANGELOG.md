@@ -5,6 +5,18 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.1] - 2026-09-08
+
+### Changed
+
+- `number.fan_power_setpoint` constrained from a plain 0–100/step‑1 range to
+  **20–100, step 10** (20, 30, ..., 100) — matching the unit's practical
+  minimum airflow (`FACTORY_SET MinFlowManual`, default 20%) and giving a
+  coarser, more practical dashboard slider. "Off" remains a separate
+  concern via `switch.power`, unaffected by this change. Note: Home
+  Assistant's `number.set_value` service doesn't reject non-multiples of
+  `step` server-side — only the dashboard slider snaps to increments of 10.
+
 ## [0.5.0] - 2026-09-08
 
 ### Added

@@ -59,8 +59,10 @@ NUMBERS = (
     ),
     # doc 21002 "AirFlowManual": only meaningful while ventilation_mode is
     # Manual (SERVICE_HARD 25000); the unit itself computes airflow in
-    # DCV/CAV/VAV/VAVC4/PCO modes.
-    Venus300NumberSpec(FAN_POWER_SETPOINT, "fan_power_setpoint", 0, 100, 1, PERCENTAGE),
+    # DCV/CAV/VAV/VAVC4/PCO modes. Constrained to the unit's practical
+    # minimum (FACTORY_SET MinFlowManual defaults to 20%) in steps of 10 --
+    # "off" is a separate concern, handled by switch.power.
+    Venus300NumberSpec(FAN_POWER_SETPOINT, "fan_power_setpoint", 20, 100, 10, PERCENTAGE),
     # doc 21003 "Temperature": valid range depends on temp_sensor_selection
     # (SERVICE_HARD 25009) — 15-45 C for supply duct, 15-30 C for extract
     # duct/room. 15-45 covers every case; the unit itself clamps further.
