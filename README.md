@@ -32,8 +32,10 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | switch | Freecooling mode | holding 21010 | on/off, *requests* freecooling — see below |
 | switch | Freecooling enabled | holding 20013 | on/off, config category, master enable — see below |
 | switch | Filter hour-based tracking | holding 25018 | on/off, config category — see below |
+| switch | Boost | holding 21008 | on/off, self-clearing timer — see below |
 | button | Reset filter usage hours | holding 21015 | press after replacing a filter — see below |
 | number | Fan power setpoint | holding 21001 | 0–100 %, raw is ‰ |
+| number | Boost duration | *(computed in HA)* | 1–60 minutes, default 5, config category — see below |
 | number | Temperature setpoint | holding 21002 | °C |
 | number | Bypass temperature threshold | holding 20036 | °C, config category |
 | number | Freecooling airflow | holding 20014 | 50–100 %, config category |
@@ -86,6 +88,25 @@ Check `binary_sensor.freecooling_active` (the unit's actual status, distinct
 from the request) and `binary_sensor.prefreecooling_active` (a transitional
 state before freecooling fully engages) to see what the unit is really
 doing.
+
+### Self-clearing Boost switch
+
+`switch.boost_active` writes SHARE's `BoostMode` (doc 21009) directly to
+activate the unit's own boost airflow — but unlike the other switches, it's
+also a timer: turning it on schedules its own automatic turn-off after
+`number.boost_timer_minutes` (default 5, adjustable 1–60, purely a Home
+Assistant-side setting with no Modbus register of its own). This simulates
+a physical "boost button" without needing an external Home Assistant
+automation to manage the countdown — trigger it from a dashboard button,
+a voice command, or any automation, and it clears itself.
+
+Turning it off manually before time's up cancels the countdown and
+deactivates boost immediately. Note: the countdown itself isn't restored
+across a Home Assistant restart — if one happens mid-boost, this switch
+comes back "off," though the unit itself keeps running boost until told
+otherwise (turn the switch on and back off to force it off explicitly).
+`binary_sensor.boost_mode_active` (from the unit's own status word) always
+reflects the unit's real state regardless of any of this.
 
 ### Filter lifetime — when to change filters
 

@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-09-08
+
+### Added
+
+- `switch.boost_active`: activates the unit's real boost airflow (SHARE
+  `BoostMode`, doc 21009 — previously only readable via
+  `binary_sensor.boost_mode_active`, never writable) and automatically
+  turns itself back off after a configurable duration — simulating a
+  physical "boost button" without an external Home Assistant automation
+  managing the timeout.
+- `number.boost_timer_minutes`: the boost duration (1–60 minutes, default
+  5). Purely a Home Assistant-side setting, no Modbus register — restores
+  across restarts.
+
 ## [0.3.0] - 2026-09-08
 
 ### Added

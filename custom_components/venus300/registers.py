@@ -223,6 +223,11 @@ FILTER_CONFIG_BLOCK = ReadBlock(
 
 # ---- Isolated holding registers, each its own transaction ----
 
+BOOST_MODE = Register(
+    "boost_mode", 21008, RegisterKind.HOLDING, writable=True
+)  # doc 21009, SHARE: BoostMode — activates the unit's own boost airflow.
+# Write-only from our side: switch.boost_active manages its own on/off state
+# in Home Assistant (see switch.py), so this isn't polled every cycle.
 FREECOOLING_MODE = Register(
     "freecooling_mode", 21010, RegisterKind.HOLDING, writable=True
 )  # doc 21011, SHARE: FreecoolingMode, manual activation request

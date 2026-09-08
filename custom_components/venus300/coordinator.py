@@ -9,7 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import DEFAULT_SCAN_INTERVAL
+from .const import DEFAULT_BOOST_TIMER_MINUTES, DEFAULT_SCAN_INTERVAL
 from .filter_usage import FilterUsageTracker
 from .modbus_client import Venus300ModbusClient, Venus300ModbusError
 from .registers import ALL_BLOCKS, FILTER_MAX_HOURS, SINGLE_HOLDING_REGISTERS, SWITCH_ON
@@ -33,6 +33,10 @@ class Venus300Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         self.client = client
         self.filter_usage = FilterUsageTracker(hass, entry.entry_id)
+        # Shared with number.Venus300BoostTimerNumber (sets it, restoring its
+        # last value across restarts) and switch.Venus300BoostSwitch (reads
+        # it when starting the auto-off countdown).
+        self.boost_timer_minutes: float = DEFAULT_BOOST_TIMER_MINUTES
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Poll every register block and isolated register."""

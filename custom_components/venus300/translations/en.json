@@ -22,7 +22,8 @@
       "power": { "name": "Power" },
       "freecooling_mode": { "name": "Freecooling mode" },
       "freecooling_enable": { "name": "Freecooling enabled" },
-      "filter_working_hours_enabled": { "name": "Filter hour-based tracking" }
+      "filter_working_hours_enabled": { "name": "Filter hour-based tracking" },
+      "boost_active": { "name": "Boost" }
     },
     "button": {
       "filter_timer_reset": { "name": "Reset filter usage hours" }
@@ -32,6 +33,7 @@
       "temperature_setpoint": { "name": "Temperature setpoint" },
       "bypass_temp_threshold": { "name": "Bypass temperature threshold" },
       "filter_max_hours": { "name": "Filter lifetime" },
+      "boost_timer_minutes": { "name": "Boost duration" },
       "freecooling_airflow": { "name": "Freecooling airflow" },
       "freecooling_temp_threshold": { "name": "Freecooling temperature threshold" },
       "freecooling_on_month": { "name": "Freecooling season start month" },

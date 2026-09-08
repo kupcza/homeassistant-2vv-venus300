@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from homeassistant.components.number import NumberEntity, NumberMode
+from homeassistant.components.number import NumberEntity, NumberMode, RestoreNumber
 from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfTemperature, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import Venus300ConfigEntry
+from .const import DEFAULT_BOOST_TIMER_MINUTES
 from .coordinator import Venus300Coordinator
 from .entity import Venus300Entity
 from .modbus_client import Venus300ModbusError
@@ -126,7 +127,11 @@ async def async_setup_entry(
 ) -> None:
     """Set up the Venus 300 numbers."""
     coordinator = entry.runtime_data
-    async_add_entities(Venus300Number(coordinator, entry, spec) for spec in NUMBERS)
+    entities: list[NumberEntity] = [
+        Venus300Number(coordinator, entry, spec) for spec in NUMBERS
+    ]
+    entities.append(Venus300BoostTimerNumber(coordinator, entry))
+    async_add_entities(entities)
 
 
 class Venus300Number(Venus300Entity, NumberEntity):
@@ -164,3 +169,39 @@ class Venus300Number(Venus300Entity, NumberEntity):
         except Venus300ModbusError as err:
             raise HomeAssistantError(str(err)) from err
         await self.coordinator.async_request_refresh()
+
+
+class Venus300BoostTimerNumber(Venus300Entity, RestoreNumber):
+    """How long switch.boost_active stays on before automatically turning off.
+
+    Purely a Home Assistant-side setting — not backed by a Modbus register —
+    so a "press for temporary boost" button/automation can be simulated
+    without an external Home Assistant automation managing the timeout.
+    """
+
+    _attr_translation_key = "boost_timer_minutes"
+    _attr_entity_category = EntityCategory.CONFIG
+    _attr_native_min_value = 1
+    _attr_native_max_value = 60
+    _attr_native_step = 1
+    _attr_native_unit_of_measurement = UnitOfTime.MINUTES
+    _attr_mode = NumberMode.BOX
+
+    def __init__(self, coordinator: Venus300Coordinator, entry: Venus300ConfigEntry) -> None:
+        """Set up the boost timer duration."""
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_boost_timer_minutes"
+        self._attr_native_value = DEFAULT_BOOST_TIMER_MINUTES
+
+    async def async_added_to_hass(self) -> None:
+        """Restore the last configured duration, if any."""
+        await super().async_added_to_hass()
+        if (last_data := await self.async_get_last_number_data()) is not None:
+            self._attr_native_value = last_data.native_value
+        self.coordinator.boost_timer_minutes = self._attr_native_value
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Store the new duration for the boost switch to read."""
+        self._attr_native_value = value
+        self.coordinator.boost_timer_minutes = value
+        self.async_write_ha_state()
