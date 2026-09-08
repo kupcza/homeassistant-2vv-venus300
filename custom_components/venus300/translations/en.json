@@ -22,18 +22,18 @@
       "power": { "name": "Power" },
       "freecooling_mode": { "name": "Freecooling mode" },
       "freecooling_enable": { "name": "Freecooling enabled" },
-      "filter_working_hours_enabled": { "name": "Filter hour-based tracking" },
-      "boost_active": { "name": "Boost" }
+      "filter_working_hours_enabled": { "name": "Filter hour-based tracking" }
     },
     "button": {
-      "filter_timer_reset": { "name": "Reset filter usage hours" }
+      "filter_timer_reset": { "name": "Reset filter usage hours" },
+      "boost": { "name": "Boost" }
     },
     "number": {
       "fan_power_setpoint": { "name": "Fan power setpoint" },
       "temperature_setpoint": { "name": "Temperature setpoint" },
       "bypass_temp_threshold": { "name": "Bypass temperature threshold" },
       "filter_max_hours": { "name": "Filter lifetime" },
-      "boost_timer_minutes": { "name": "Boost duration (HA switch only)" },
+      "boost_timer_minutes": { "name": "Boost duration (HA button only)" },
       "boost_timer": { "name": "Boost duration (unit, all triggers)" },
       "freecooling_airflow": { "name": "Freecooling airflow" },
       "freecooling_temp_threshold": { "name": "Freecooling temperature threshold" },

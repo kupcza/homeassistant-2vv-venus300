@@ -34,7 +34,7 @@ class Venus300Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.client = client
         self.filter_usage = FilterUsageTracker(hass, entry.entry_id)
         # Shared with number.Venus300BoostTimerNumber (sets it, restoring its
-        # last value across restarts) and switch.Venus300BoostSwitch (reads
+        # last value across restarts) and button.Venus300BoostButton (reads
         # it when starting the auto-off countdown).
         self.boost_timer_minutes: float = DEFAULT_BOOST_TIMER_MINUTES
 

@@ -53,7 +53,7 @@ NUMBERS = (
     # doc 20012 "BoostTimer": the UNIT's own boost auto-off duration —
     # applies no matter what activates boost (physical DI-5 switch, control
     # panel, or Modbus), unlike number.boost_timer_minutes below, which only
-    # times out switch.boost_active's own Home-Assistant-managed activation.
+    # times out button.boost's own Home-Assistant-managed activation.
     Venus300NumberSpec(
         BOOST_TIMER, "boost_timer", 1, 60, 1, UnitOfTime.MINUTES, EntityCategory.CONFIG
     ),
@@ -182,7 +182,7 @@ class Venus300Number(Venus300Entity, NumberEntity):
 
 
 class Venus300BoostTimerNumber(Venus300Entity, RestoreNumber):
-    """How long switch.boost_active stays on before automatically turning off.
+    """How long button.boost keeps boost on before automatically turning off.
 
     Purely a Home Assistant-side setting — not backed by a Modbus register —
     so a "press for temporary boost" button/automation can be simulated

@@ -5,6 +5,25 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.0] - 2026-09-08
+
+### Changed (breaking)
+
+- Replaced `switch.boost_active` with **`button.boost`**: a momentary
+  action is a better fit than a persistent switch for a self-clearing,
+  timed boost. Pressing it (re)starts a fresh countdown, matching a
+  physical push-button, rather than toggling on/off — there's no "press
+  to cancel early" now; use `switch.power` to stop everything immediately
+  instead. The snapshot/restore-on-end safety net (added in 0.4.1) now
+  only snapshots on the *first* press of a sequence, so repeated presses
+  extending the boost don't lose track of the true pre-boost state.
+- `number.boost_timer_minutes` renamed display name to "Boost duration
+  (HA button only)" to match.
+
+If you had automations or dashboards calling `switch.turn_on`/
+`switch.turn_off` on `switch.boost_active`, change them to `button.press`
+on `button.boost`.
+
 ## [0.5.1] - 2026-09-08
 
 ### Changed

@@ -160,7 +160,7 @@ BOOST_TIMER = Register(
 # auto-off duration, applied no matter what activates boost: the physical
 # DI-5 wired switch, the control panel, or Modbus. Distinct from
 # number.boost_timer_minutes (switch.py), which only times out
-# switch.boost_active's own Home-Assistant-managed activation.
+# button.boost's own Home-Assistant-managed activation.
 FREECOOLING_ENABLE = Register(
     "freecooling_enable", 20013, RegisterKind.HOLDING, writable=True
 )  # doc 20014, SERVICE: FreecoolingEnable, master enable for freecooling
@@ -237,7 +237,7 @@ FILTER_CONFIG_BLOCK = ReadBlock(
 BOOST_MODE = Register(
     "boost_mode", 21008, RegisterKind.HOLDING, writable=True
 )  # doc 21009, SHARE: BoostMode — activates the unit's own boost airflow.
-# Write-only from our side: switch.boost_active manages its own on/off state
+# Write-only from our side: button.boost manages its own on/off state
 # in Home Assistant (see switch.py), so this isn't polled every cycle.
 FREECOOLING_MODE = Register(
     "freecooling_mode", 21010, RegisterKind.HOLDING, writable=True
