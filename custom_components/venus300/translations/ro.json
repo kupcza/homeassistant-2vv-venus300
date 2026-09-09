@@ -1,0 +1,150 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Conectare la unitatea 2VV Venus 300 (AirGenio) prin Modbus TCP.",
+        "data": {
+          "host": "Gazdă",
+          "port": "Port",
+          "slave_id": "ID unitate/slave Modbus"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Conectarea la unitate a eșuat. Verificați gazda, portul și rețeaua."
+    },
+    "abort": {
+      "already_configured": "Această gazdă și port sunt deja configurate."
+    }
+  },
+  "entity": {
+    "switch": {
+      "power": { "name": "Alimentare" },
+      "freecooling_mode": { "name": "Mod Freecooling" },
+      "freecooling_enable": { "name": "Freecooling activat" },
+      "filter_working_hours_enabled": { "name": "Urmărire filtru după ore de funcționare" }
+    },
+    "button": {
+      "filter_timer_reset": { "name": "Resetare ore de utilizare filtru" },
+      "boost": { "name": "Boost" }
+    },
+    "number": {
+      "fan_power_setpoint": { "name": "Punct de referință putere ventilator" },
+      "temperature_setpoint": { "name": "Punct de referință temperatură" },
+      "bypass_temp_threshold": { "name": "Prag temperatură bypass" },
+      "filter_max_hours": { "name": "Durată de viață filtru" },
+      "boost_timer_minutes": { "name": "Durată Boost (doar buton HA)" },
+      "boost_timer": { "name": "Durată Boost (unitate, toate declanșările)" },
+      "freecooling_airflow": { "name": "Debit aer Freecooling" },
+      "freecooling_temp_threshold": { "name": "Prag temperatură Freecooling" },
+      "freecooling_on_month": { "name": "Freecooling – luna de început a sezonului" },
+      "freecooling_on_day": { "name": "Freecooling – ziua de început a sezonului" },
+      "freecooling_on_hour": { "name": "Freecooling – ora de început permisă" },
+      "freecooling_on_min": { "name": "Freecooling – minutul de început permis" },
+      "freecooling_off_month": { "name": "Freecooling – luna de sfârșit a sezonului" },
+      "freecooling_off_day": { "name": "Freecooling – ziua de sfârșit a sezonului" },
+      "freecooling_off_hour": { "name": "Freecooling – ora de sfârșit permisă" },
+      "freecooling_off_min": { "name": "Freecooling – minutul de sfârșit permis" }
+    },
+    "sensor": {
+      "temperature_outside_to_unit": { "name": "Temperatură exterior spre unitate" },
+      "temperature_unit_to_house": { "name": "Temperatură unitate spre casă" },
+      "temperature_house_to_unit": { "name": "Temperatură casă spre unitate" },
+      "temperature_unit_to_outside": { "name": "Temperatură unitate spre exterior" },
+      "inlet_fan_power": { "name": "Putere ventilator admisie" },
+      "outlet_fan_power": { "name": "Putere ventilator evacuare" },
+      "inlet_filter_life": { "name": "Durată de viață filtru admisie" },
+      "outlet_filter_life": { "name": "Durată de viață filtru evacuare" },
+      "filter_pressure_inlet": { "name": "Cădere de presiune filtru admisie" },
+      "filter_pressure_outlet": { "name": "Cădere de presiune filtru evacuare" },
+      "hepa_filter_life": { "name": "Durată de viață filtru HEPA" },
+      "hepa_filter_pressure": { "name": "Cădere de presiune filtru HEPA" },
+      "filter_usage_hours": { "name": "Utilizare filtru (estimat, ore)" },
+      "filter_usage_percent": { "name": "Utilizare filtru % (estimat)" },
+      "filter_usage_reset_at": { "name": "Ultima resetare utilizare filtru" },
+      "bypass_position": { "name": "Poziție bypass" },
+      "bypass_type": {
+        "name": "Tip bypass",
+        "state": {
+          "none": "Niciunul",
+          "stepless_0_10v": "Continuu (0-10 V)",
+          "open_close": "Deschis/închis"
+        }
+      },
+      "filter_disable_status": {
+        "name": "Monitorizare filtre",
+        "state": {
+          "all_active": "Toate active",
+          "inlet_disabled": "Admisie dezactivată",
+          "outlet_disabled": "Evacuare dezactivată"
+        }
+      },
+      "temp_sensor_selection": {
+        "name": "Selecție senzor de temperatură",
+        "state": {
+          "supply_duct": "Canal de refulare",
+          "extract_duct": "Canal de extracție",
+          "room": "Cameră"
+        }
+      },
+      "ventilation_mode": {
+        "name": "Mod ventilație",
+        "state": {
+          "manual": "Manual",
+          "dcv": "DCV",
+          "cav": "CAV",
+          "vav": "VAV",
+          "vavc4": "VAV C4",
+          "pco": "pCO"
+        }
+      },
+      "modbus_port": { "name": "Port Modbus (confirmare)" },
+      "global_status_raw": { "name": "Stare globală (brută)" },
+      "global_status2_raw": { "name": "Stare globală 2 (brută)" },
+      "sw_error1_raw": { "name": "Eroare software 1 (brută)" },
+      "sw_error2_raw": { "name": "Eroare software 2 (brută)" }
+    },
+    "binary_sensor": {
+      "manual_mode_active": { "name": "Mod manual activ" },
+      "dcv_mode_active": { "name": "Mod DCV activ" },
+      "fire_mode_active": { "name": "Mod incendiu activ" },
+      "boost_mode_active": { "name": "Boost activ" },
+      "nobody_mode_active": { "name": "Mod absență activ" },
+      "freecooling_active": { "name": "Freecooling activ" },
+      "timeswitch_mode_active": { "name": "Mod temporizator activ" },
+      "calibration_active": { "name": "Calibrare activă" },
+      "cooldown_active": { "name": "Răcire (cooldown) activă" },
+      "direct_control_active": { "name": "Control direct activ" },
+      "filter_change_due": { "name": "Necesită schimbarea filtrului" },
+      "fw_update_error": { "name": "Eroare actualizare firmware" },
+      "fw_update_active": { "name": "Actualizare firmware în curs" },
+      "recirculation_active": { "name": "Recirculare activă" },
+      "simulation_active": { "name": "Simulare activă" },
+      "prefreecooling_active": { "name": "Pre-freecooling activ" },
+      "temp_flow_reduction_active": { "name": "Reducere debit din cauza temperaturii activă" },
+      "passive_house_restriction_active": { "name": "Restricție casă pasivă activă" },
+      "adb_active": { "name": "ADB activ" },
+      "vavc4_active": { "name": "VAV C4 activ" },
+      "pco_active": { "name": "pCO activ" },
+      "fan_inlet_error": { "name": "Eroare ventilator admisie" },
+      "fan_outlet_error": { "name": "Eroare ventilator evacuare" },
+      "filter_inlet_error": { "name": "Eroare filtru admisie" },
+      "filter_outlet_error": { "name": "Eroare filtru evacuare" },
+      "filter_inlet_warning": { "name": "Avertisment filtru admisie" },
+      "filter_outlet_warning": { "name": "Avertisment filtru evacuare" },
+      "rotary_wheel_error": { "name": "Eroare rotor recuperator" },
+      "adb_error": { "name": "Eroare ADB" },
+      "dx_error": { "name": "Eroare DX" },
+      "dx_defrost": { "name": "Dezghețare DX activă" },
+      "condensate_drain": { "name": "Evacuare condens" },
+      "g_error": { "name": "Eroare G" },
+      "global_error": { "name": "Eroare globală" },
+      "k_error": { "name": "Eroare K" },
+      "filter_info_flag": { "name": "Indicator informare filtru" },
+      "cfg_file_error": { "name": "Eroare fișier de configurare" },
+      "filter_hepa_error": { "name": "Eroare filtru HEPA" },
+      "filter_hepa_warning": { "name": "Avertisment filtru HEPA" },
+      "ibus_gateway_error": { "name": "Eroare gateway IBUS" }
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Modbus TCP üzerinden 2VV Venus 300 (AirGenio) ünitesine bağlanın.",
+        "data": {
+          "host": "Ana Bilgisayar",
+          "port": "Port",
+          "slave_id": "Modbus Slave/Ünite Kimliği"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Üniteye bağlanılamadı. Ana bilgisayarı, portu ve ağı kontrol edin."
+    },
+    "abort": {
+      "already_configured": "Bu ana bilgisayar ve port zaten yapılandırılmış."
+    }
+  },
+  "entity": {
+    "switch": {
+      "power": { "name": "Güç" },
+      "freecooling_mode": { "name": "Freecooling Modu" },
+      "freecooling_enable": { "name": "Freecooling Etkin" },
+      "filter_working_hours_enabled": { "name": "Filtre Çalışma Saati Takibi" }
+    },
+    "button": {
+      "filter_timer_reset": { "name": "Filtre Kullanım Saatini Sıfırla" },
+      "boost": { "name": "Boost" }
+    },
+    "number": {
+      "fan_power_setpoint": { "name": "Fan Gücü Ayar Noktası" },
+      "temperature_setpoint": { "name": "Sıcaklık Ayar Noktası" },
+      "bypass_temp_threshold": { "name": "Bypass Sıcaklık Eşiği" },
+      "filter_max_hours": { "name": "Filtre Ömrü" },
+      "boost_timer_minutes": { "name": "Boost Süresi (yalnızca HA düğmesi)" },
+      "boost_timer": { "name": "Boost Süresi (ünite, tüm tetikleyiciler)" },
+      "freecooling_airflow": { "name": "Freecooling Hava Akışı" },
+      "freecooling_temp_threshold": { "name": "Freecooling Sıcaklık Eşiği" },
+      "freecooling_on_month": { "name": "Freecooling Sezon Başlangıç Ayı" },
+      "freecooling_on_day": { "name": "Freecooling Sezon Başlangıç Günü" },
+      "freecooling_on_hour": { "name": "Freecooling İzin Başlangıç Saati" },
+      "freecooling_on_min": { "name": "Freecooling İzin Başlangıç Dakikası" },
+      "freecooling_off_month": { "name": "Freecooling Sezon Bitiş Ayı" },
+      "freecooling_off_day": { "name": "Freecooling Sezon Bitiş Günü" },
+      "freecooling_off_hour": { "name": "Freecooling İzin Bitiş Saati" },
+      "freecooling_off_min": { "name": "Freecooling İzin Bitiş Dakikası" }
+    },
+    "sensor": {
+      "temperature_outside_to_unit": { "name": "Dış Ortamdan Üniteye Sıcaklık" },
+      "temperature_unit_to_house": { "name": "Üniteden Eve Sıcaklık" },
+      "temperature_house_to_unit": { "name": "Evden Üniteye Sıcaklık" },
+      "temperature_unit_to_outside": { "name": "Üniteden Dışarıya Sıcaklık" },
+      "inlet_fan_power": { "name": "Giriş Fanı Gücü" },
+      "outlet_fan_power": { "name": "Çıkış Fanı Gücü" },
+      "inlet_filter_life": { "name": "Giriş Filtresi Ömrü" },
+      "outlet_filter_life": { "name": "Çıkış Filtresi Ömrü" },
+      "filter_pressure_inlet": { "name": "Giriş Filtresi Basınç Düşüşü" },
+      "filter_pressure_outlet": { "name": "Çıkış Filtresi Basınç Düşüşü" },
+      "hepa_filter_life": { "name": "HEPA Filtre Ömrü" },
+      "hepa_filter_pressure": { "name": "HEPA Filtre Basınç Düşüşü" },
+      "filter_usage_hours": { "name": "Filtre Kullanımı (tahmini, saat)" },
+      "filter_usage_percent": { "name": "Filtre Kullanımı % (tahmini)" },
+      "filter_usage_reset_at": { "name": "Son Filtre Kullanımı Sıfırlama" },
+      "bypass_position": { "name": "Bypass Konumu" },
+      "bypass_type": {
+        "name": "Bypass Tipi",
+        "state": {
+          "none": "Yok",
+          "stepless_0_10v": "Kademesiz (0-10 V)",
+          "open_close": "Aç/Kapa"
+        }
+      },
+      "filter_disable_status": {
+        "name": "Filtre İzleme",
+        "state": {
+          "all_active": "Tümü Aktif",
+          "inlet_disabled": "Giriş Devre Dışı",
+          "outlet_disabled": "Çıkış Devre Dışı"
+        }
+      },
+      "temp_sensor_selection": {
+        "name": "Sıcaklık Sensörü Seçimi",
+        "state": {
+          "supply_duct": "Besleme Kanalı",
+          "extract_duct": "Egzoz Kanalı",
+          "room": "Oda"
+        }
+      },
+      "ventilation_mode": {
+        "name": "Havalandırma Modu",
+        "state": {
+          "manual": "Manuel",
+          "dcv": "DCV",
+          "cav": "CAV",
+          "vav": "VAV",
+          "vavc4": "VAV C4",
+          "pco": "pCO"
+        }
+      },
+      "modbus_port": { "name": "Modbus Portu (geri okuma)" },
+      "global_status_raw": { "name": "Genel Durum (ham)" },
+      "global_status2_raw": { "name": "Genel Durum 2 (ham)" },
+      "sw_error1_raw": { "name": "Yazılım Hatası 1 (ham)" },
+      "sw_error2_raw": { "name": "Yazılım Hatası 2 (ham)" }
+    },
+    "binary_sensor": {
+      "manual_mode_active": { "name": "Manuel Mod Aktif" },
+      "dcv_mode_active": { "name": "DCV Modu Aktif" },
+      "fire_mode_active": { "name": "Yangın Modu Aktif" },
+      "boost_mode_active": { "name": "Boost Aktif" },
+      "nobody_mode_active": { "name": "Kimse Yok Modu Aktif" },
+      "freecooling_active": { "name": "Freecooling Aktif" },
+      "timeswitch_mode_active": { "name": "Zaman Anahtarı Modu Aktif" },
+      "calibration_active": { "name": "Kalibrasyon Aktif" },
+      "cooldown_active": { "name": "Soğuma Süresi Aktif" },
+      "direct_control_active": { "name": "Doğrudan Kontrol Aktif" },
+      "filter_change_due": { "name": "Filtre Değişimi Gerekiyor" },
+      "fw_update_error": { "name": "Bellenim Güncelleme Hatası" },
+      "fw_update_active": { "name": "Bellenim Güncellemesi Aktif" },
+      "recirculation_active": { "name": "Resirkülasyon Aktif" },
+      "simulation_active": { "name": "Simülasyon Aktif" },
+      "prefreecooling_active": { "name": "Ön Freecooling Aktif" },
+      "temp_flow_reduction_active": { "name": "Sıcaklık Nedeniyle Akış Azaltma Aktif" },
+      "passive_house_restriction_active": { "name": "Pasif Ev Kısıtlaması Aktif" },
+      "adb_active": { "name": "ADB Aktif" },
+      "vavc4_active": { "name": "VAV C4 Aktif" },
+      "pco_active": { "name": "pCO Aktif" },
+      "fan_inlet_error": { "name": "Giriş Fanı Hatası" },
+      "fan_outlet_error": { "name": "Çıkış Fanı Hatası" },
+      "filter_inlet_error": { "name": "Giriş Filtresi Hatası" },
+      "filter_outlet_error": { "name": "Çıkış Filtresi Hatası" },
+      "filter_inlet_warning": { "name": "Giriş Filtresi Uyarısı" },
+      "filter_outlet_warning": { "name": "Çıkış Filtresi Uyarısı" },
+      "rotary_wheel_error": { "name": "Döner Isı Geri Kazanım Çarkı Hatası" },
+      "adb_error": { "name": "ADB Hatası" },
+      "dx_error": { "name": "DX Hatası" },
+      "dx_defrost": { "name": "DX Defrost Aktif" },
+      "condensate_drain": { "name": "Yoğuşma Suyu Tahliyesi" },
+      "g_error": { "name": "G Hatası" },
+      "global_error": { "name": "Genel Hata" },
+      "k_error": { "name": "K Hatası" },
+      "filter_info_flag": { "name": "Filtre Bilgi Bayrağı" },
+      "cfg_file_error": { "name": "Yapılandırma Dosyası Hatası" },
+      "filter_hepa_error": { "name": "HEPA Filtre Hatası" },
+      "filter_hepa_warning": { "name": "HEPA Filtre Uyarısı" },
+      "ibus_gateway_error": { "name": "IBUS Ağ Geçidi Hatası" }
+    }
+  }
+}

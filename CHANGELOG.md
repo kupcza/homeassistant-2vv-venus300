@@ -5,6 +5,18 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.7.0] - 2026-09-09
+
+### Added
+
+- Translations: Czech (`cs`), Turkish (`tr`), and Romanian (`ro`), covering
+  the config flow and all entity names/enum states. `strings.json` remains
+  the source of truth; each language file mirrors its exact key structure.
+- `tests/test_translations.py` now asserts every translation file's key
+  structure exactly matches `strings.json`, for all four languages
+  (`en`/`cs`/`tr`/`ro`), so a future change to `strings.json` that isn't
+  mirrored everywhere fails CI instead of shipping silently broken.
+
 ## [0.6.1] - 2026-09-09
 
 ### Documentation

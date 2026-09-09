@@ -379,6 +379,17 @@ are the vendor documentation this register map and bitfield decoding were
 built from — keep them for future reference (e.g. adding heater/AQS
 entities for other Venus 300 configurations).
 
+### Translations
+
+`strings.json` is the source of truth; `translations/<lang>.json` are
+verbatim copies with only the `name`/`description`/`state` values
+translated — same keys, same structure. Currently English (`en`), Czech
+(`cs`), Turkish (`tr`), and Romanian (`ro`). To add a language, copy
+`strings.json` to `translations/<code>.json`, translate the values, and
+add the language code to `TRANSLATED_LANGUAGES` in
+`tests/test_translations.py`, which enforces that every translation file's
+key structure exactly matches `strings.json`.
+
 ### Tests
 
 ```

@@ -1,0 +1,150 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Připojení k jednotce 2VV Venus 300 (AirGenio) přes Modbus TCP.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "slave_id": "ID jednotky Modbus (slave)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nepodařilo se připojit k jednotce. Zkontrolujte adresu, port a síť."
+    },
+    "abort": {
+      "already_configured": "Tento host a port jsou již nakonfigurovány."
+    }
+  },
+  "entity": {
+    "switch": {
+      "power": { "name": "Napájení" },
+      "freecooling_mode": { "name": "Režim Freecooling" },
+      "freecooling_enable": { "name": "Freecooling povolen" },
+      "filter_working_hours_enabled": { "name": "Sledování filtru podle hodin provozu" }
+    },
+    "button": {
+      "filter_timer_reset": { "name": "Reset počtu hodin filtru" },
+      "boost": { "name": "Boost" }
+    },
+    "number": {
+      "fan_power_setpoint": { "name": "Požadovaný výkon ventilátoru" },
+      "temperature_setpoint": { "name": "Požadovaná teplota" },
+      "bypass_temp_threshold": { "name": "Teplotní práh bypassu" },
+      "filter_max_hours": { "name": "Životnost filtru" },
+      "boost_timer_minutes": { "name": "Doba trvání Boost (pouze tlačítko HA)" },
+      "boost_timer": { "name": "Doba trvání Boost (jednotka, všechny spouštěče)" },
+      "freecooling_airflow": { "name": "Průtok vzduchu při Freecoolingu" },
+      "freecooling_temp_threshold": { "name": "Teplotní práh Freecoolingu" },
+      "freecooling_on_month": { "name": "Freecooling – měsíc začátku sezóny" },
+      "freecooling_on_day": { "name": "Freecooling – den začátku sezóny" },
+      "freecooling_on_hour": { "name": "Freecooling – hodina povolení od" },
+      "freecooling_on_min": { "name": "Freecooling – minuta povolení od" },
+      "freecooling_off_month": { "name": "Freecooling – měsíc konce sezóny" },
+      "freecooling_off_day": { "name": "Freecooling – den konce sezóny" },
+      "freecooling_off_hour": { "name": "Freecooling – hodina povolení do" },
+      "freecooling_off_min": { "name": "Freecooling – minuta povolení do" }
+    },
+    "sensor": {
+      "temperature_outside_to_unit": { "name": "Teplota venku před jednotkou" },
+      "temperature_unit_to_house": { "name": "Teplota z jednotky do domu" },
+      "temperature_house_to_unit": { "name": "Teplota z domu do jednotky" },
+      "temperature_unit_to_outside": { "name": "Teplota z jednotky ven" },
+      "inlet_fan_power": { "name": "Výkon přívodního ventilátoru" },
+      "outlet_fan_power": { "name": "Výkon odtahového ventilátoru" },
+      "inlet_filter_life": { "name": "Životnost přívodního filtru" },
+      "outlet_filter_life": { "name": "Životnost odtahového filtru" },
+      "filter_pressure_inlet": { "name": "Tlaková ztráta přívodního filtru" },
+      "filter_pressure_outlet": { "name": "Tlaková ztráta odtahového filtru" },
+      "hepa_filter_life": { "name": "Životnost HEPA filtru" },
+      "hepa_filter_pressure": { "name": "Tlaková ztráta HEPA filtru" },
+      "filter_usage_hours": { "name": "Využití filtru (odhad, hodiny)" },
+      "filter_usage_percent": { "name": "Využití filtru % (odhad)" },
+      "filter_usage_reset_at": { "name": "Poslední reset využití filtru" },
+      "bypass_position": { "name": "Poloha bypassu" },
+      "bypass_type": {
+        "name": "Typ bypassu",
+        "state": {
+          "none": "Žádný",
+          "stepless_0_10v": "Plynulý (0–10 V)",
+          "open_close": "Otevřít/zavřít"
+        }
+      },
+      "filter_disable_status": {
+        "name": "Sledování filtrů",
+        "state": {
+          "all_active": "Vše aktivní",
+          "inlet_disabled": "Přívodní vypnuto",
+          "outlet_disabled": "Odtahové vypnuto"
+        }
+      },
+      "temp_sensor_selection": {
+        "name": "Výběr teplotního čidla",
+        "state": {
+          "supply_duct": "Přívodní potrubí",
+          "extract_duct": "Odtahové potrubí",
+          "room": "Místnost"
+        }
+      },
+      "ventilation_mode": {
+        "name": "Režim větrání",
+        "state": {
+          "manual": "Ruční",
+          "dcv": "DCV",
+          "cav": "CAV",
+          "vav": "VAV",
+          "vavc4": "VAV C4",
+          "pco": "pCO"
+        }
+      },
+      "modbus_port": { "name": "Port Modbus (zpětná vazba)" },
+      "global_status_raw": { "name": "Globální stav (surová data)" },
+      "global_status2_raw": { "name": "Globální stav 2 (surová data)" },
+      "sw_error1_raw": { "name": "Softwarová chyba 1 (surová data)" },
+      "sw_error2_raw": { "name": "Softwarová chyba 2 (surová data)" }
+    },
+    "binary_sensor": {
+      "manual_mode_active": { "name": "Aktivní ruční režim" },
+      "dcv_mode_active": { "name": "Aktivní režim DCV" },
+      "fire_mode_active": { "name": "Aktivní požární režim" },
+      "boost_mode_active": { "name": "Aktivní Boost" },
+      "nobody_mode_active": { "name": "Aktivní režim nepřítomnosti" },
+      "freecooling_active": { "name": "Aktivní Freecooling" },
+      "timeswitch_mode_active": { "name": "Aktivní časový spínač" },
+      "calibration_active": { "name": "Probíhá kalibrace" },
+      "cooldown_active": { "name": "Aktivní doběh (cooldown)" },
+      "direct_control_active": { "name": "Aktivní přímé řízení" },
+      "filter_change_due": { "name": "Nutná výměna filtru" },
+      "fw_update_error": { "name": "Chyba aktualizace firmwaru" },
+      "fw_update_active": { "name": "Probíhá aktualizace firmwaru" },
+      "recirculation_active": { "name": "Aktivní recirkulace" },
+      "simulation_active": { "name": "Aktivní simulace" },
+      "prefreecooling_active": { "name": "Aktivní přípravná fáze Freecoolingu" },
+      "temp_flow_reduction_active": { "name": "Aktivní snížení průtoku kvůli teplotě" },
+      "passive_house_restriction_active": { "name": "Aktivní omezení pro pasivní domy" },
+      "adb_active": { "name": "Aktivní ADB" },
+      "vavc4_active": { "name": "Aktivní VAV C4" },
+      "pco_active": { "name": "Aktivní pCO" },
+      "fan_inlet_error": { "name": "Chyba přívodního ventilátoru" },
+      "fan_outlet_error": { "name": "Chyba odtahového ventilátoru" },
+      "filter_inlet_error": { "name": "Chyba přívodního filtru" },
+      "filter_outlet_error": { "name": "Chyba odtahového filtru" },
+      "filter_inlet_warning": { "name": "Varování přívodního filtru" },
+      "filter_outlet_warning": { "name": "Varování odtahového filtru" },
+      "rotary_wheel_error": { "name": "Chyba rotačního výměníku" },
+      "adb_error": { "name": "Chyba ADB" },
+      "dx_error": { "name": "Chyba DX" },
+      "dx_defrost": { "name": "Probíhá odmrazování DX" },
+      "condensate_drain": { "name": "Odvod kondenzátu" },
+      "g_error": { "name": "Chyba G" },
+      "global_error": { "name": "Globální chyba" },
+      "k_error": { "name": "Chyba K" },
+      "filter_info_flag": { "name": "Informace o filtru" },
+      "cfg_file_error": { "name": "Chyba konfiguračního souboru" },
+      "filter_hepa_error": { "name": "Chyba HEPA filtru" },
+      "filter_hepa_warning": { "name": "Varování HEPA filtru" },
+      "ibus_gateway_error": { "name": "Chyba brány IBUS" }
+    }
+  }
+}
