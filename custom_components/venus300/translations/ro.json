@@ -105,6 +105,7 @@
       "sw_error2_raw": { "name": "Eroare software 2 (brută)" }
     },
     "binary_sensor": {
+      "freecooling_conditions_met": { "name": "Condiții Freecooling îndeplinite" },
       "manual_mode_active": { "name": "Mod manual activ" },
       "dcv_mode_active": { "name": "Mod DCV activ" },
       "fire_mode_active": { "name": "Mod incendiu activ" },

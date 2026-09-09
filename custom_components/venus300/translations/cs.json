@@ -105,6 +105,7 @@
       "sw_error2_raw": { "name": "Softwarová chyba 2 (surová data)" }
     },
     "binary_sensor": {
+      "freecooling_conditions_met": { "name": "Podmínky pro Freecooling splněny" },
       "manual_mode_active": { "name": "Aktivní ruční režim" },
       "dcv_mode_active": { "name": "Aktivní režim DCV" },
       "fire_mode_active": { "name": "Aktivní požární režim" },

@@ -64,6 +64,7 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | sensor | Modbus port (readback) | input 16020 | diagnostic |
 | sensor | Global status / status 2 / error 1 / error 2 (raw) | input 14999–15002 | diagnostic, raw 16-bit words (see below) |
 | binary_sensor | 40 decoded status/error bits | input 14999–15002 | diagnostic; see `bitfields.py` |
+| binary_sensor | Freecooling conditions met | *(computed in HA)* | diagnostic; excludes `freecooling_enable` — see below |
 
 Register addresses are wire (0-based) addresses, one less than the
 "PLC Addresses - BASE1" numbers in `MODBUS_V1_FW166_167.xlsx`; this mirrors
@@ -104,6 +105,17 @@ Check `binary_sensor.freecooling_active` (the unit's real, confirmed status)
 and `binary_sensor.prefreecooling_active` (a transitional state before it
 fully engages) — these reflect ground truth from direct register reads,
 independent of whatever `switch.freecooling_mode` shows.
+
+**`binary_sensor.freecooling_conditions_met`** answers "would Freecooling
+run right now, ignoring whether it's enabled" — conditions 2–4 above,
+deliberately excluding `freecooling_enable` (check that separately). Its
+attributes (`temperature_ok`, `season_ok`, `hour_window_ok`) break down
+which specific condition is or isn't currently satisfied, for at-a-glance
+troubleshooting instead of comparing several entities by hand. Computed in
+`freecooling_conditions.py` using the unit's own real-time clock (also
+newly exposed, read every poll — see `registers.py`'s `TIME_BLOCK`), not
+Home Assistant's, since that's what the scheduler itself is confirmed to
+use.
 
 ### The actual cooling mechanism: fan control, not a bypass damper
 

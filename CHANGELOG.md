@@ -5,6 +5,27 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.8.0] - 2026-09-09
+
+### Added
+
+- `binary_sensor.freecooling_conditions_met`: answers "would Freecooling
+  run right now" by evaluating temperature, season, and hour-window
+  conditions (deliberately excluding `freecooling_enable`, which has its
+  own switch) — with a `temperature_ok`/`season_ok`/`hour_window_ok`
+  attribute breakdown for troubleshooting. Confirmed live against the real
+  unit: `all_met` correctly matched `freecooling_active` once combined
+  with `freecooling_enable`.
+- The unit's own real-time clock (TIME sheet, previously unused) is now
+  polled every cycle and used for this evaluation — confirmed the
+  scheduler evaluates its season/hour window against this clock, not
+  Home Assistant's.
+- New `freecooling_conditions.py` module with the evaluation logic
+  (fixed a same-day-vs-wrap hour-window bug caught by its own test suite
+  before shipping — the wrap formula is only valid when `on_hour >
+  off_hour`) and `tests/test_freecooling_conditions.py` covering both
+  same-day and wrap-past-midnight window shapes.
+
 ## [0.7.0] - 2026-09-09
 
 ### Added

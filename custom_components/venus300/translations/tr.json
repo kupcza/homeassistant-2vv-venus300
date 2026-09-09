@@ -105,6 +105,7 @@
       "sw_error2_raw": { "name": "Yazılım Hatası 2 (ham)" }
     },
     "binary_sensor": {
+      "freecooling_conditions_met": { "name": "Freecooling Koşulları Karşılandı" },
       "manual_mode_active": { "name": "Manuel Mod Aktif" },
       "dcv_mode_active": { "name": "DCV Modu Aktif" },
       "fire_mode_active": { "name": "Yangın Modu Aktif" },

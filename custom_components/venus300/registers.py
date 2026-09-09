@@ -130,6 +130,27 @@ STATUS_BLOCK = ReadBlock(
 MODBUS_PORT = Register("modbus_port", 16020, RegisterKind.INPUT)  # doc 16021, INFO: ModbusPort
 PORT_BLOCK = ReadBlock(RegisterKind.INPUT, 16020, 1, (MODBUS_PORT,))
 
+# ---- The unit's own real-time clock (Input Registers, TIME sheet) ----
+# Confirmed by live debugging: schedule-based features (e.g. Freecooling's
+# season/allowed-hours window) are evaluated against THIS clock, not
+# whatever time Home Assistant's host thinks it is. One read covers
+# 16999..17005 (7 registers; ActualDayOfWeek at 17002 is fetched but not
+# decoded, unused here) in a single transaction.
+
+ACTUAL_YEAR = Register("actual_year", 16999, RegisterKind.INPUT)  # doc 17000
+ACTUAL_MONTH = Register("actual_month", 17000, RegisterKind.INPUT)  # doc 17001
+ACTUAL_DAY = Register("actual_day", 17001, RegisterKind.INPUT)  # doc 17002
+ACTUAL_HOUR = Register("actual_hour", 17003, RegisterKind.INPUT)  # doc 17004
+ACTUAL_MIN = Register("actual_min", 17004, RegisterKind.INPUT)  # doc 17005
+ACTUAL_SEC = Register("actual_sec", 17005, RegisterKind.INPUT)  # doc 17006
+
+TIME_BLOCK = ReadBlock(
+    RegisterKind.INPUT,
+    16999,
+    7,
+    (ACTUAL_YEAR, ACTUAL_MONTH, ACTUAL_DAY, ACTUAL_HOUR, ACTUAL_MIN, ACTUAL_SEC),
+)
+
 # ---- Control block (Holding Registers, SHARE sheet) ----
 # One read/write-relevant read covers 21000..21002 in a single transaction.
 
@@ -276,7 +297,14 @@ SINGLE_HOLDING_REGISTERS = (
     TEMP_SENSOR_SELECTION_RAW,
 )
 
-ALL_BLOCKS = (STATUS_BLOCK, PORT_BLOCK, CONTROL_BLOCK, FREECOOLING_BLOCK, FILTER_CONFIG_BLOCK)
+ALL_BLOCKS = (
+    STATUS_BLOCK,
+    PORT_BLOCK,
+    TIME_BLOCK,
+    CONTROL_BLOCK,
+    FREECOOLING_BLOCK,
+    FILTER_CONFIG_BLOCK,
+)
 
 # ---- Enum decodings for read-only raw registers ----
 # Bit-level meanings of GLOBAL_STATUS_RAW / GLOBAL_STATUS2_RAW / SW_ERROR1_RAW

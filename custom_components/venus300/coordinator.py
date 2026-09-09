@@ -9,6 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
+from . import freecooling_conditions
 from .const import DEFAULT_BOOST_TIMER_MINUTES, DEFAULT_SCAN_INTERVAL
 from .filter_usage import FilterUsageTracker
 from .modbus_client import Venus300ModbusClient, Venus300ModbusError
@@ -58,5 +59,7 @@ class Venus300Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             round(min(100.0, usage_hours / max_hours * 100), 1) if max_hours else None
         )
         data["filter_usage_reset_at"] = self.filter_usage.last_reset_at
+
+        data["freecooling_conditions"] = freecooling_conditions.evaluate(data)
 
         return data

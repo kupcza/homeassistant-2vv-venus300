@@ -72,9 +72,15 @@ def test_sensor_translation_keys_are_declared():
     assert declared <= used, declared - used
 
 
-def test_binary_sensor_translation_keys_match_bitfields_exactly():
+def test_binary_sensor_translation_keys_match_bitfields_plus_computed_sensors():
     from custom_components.venus300 import bitfields
 
+    # binary_sensor.py also declares a handful of entities that aren't
+    # decoded from a status-word bit (see freecooling_conditions.py) --
+    # listed explicitly here rather than pattern-matched from the module,
+    # since there's no dataclass tuple to introspect for those.
+    computed_sensors = {"freecooling_conditions_met"}
+
     declared = set(_load_strings()["entity"]["binary_sensor"])
-    used = {spec.translation_key for spec in bitfields.ALL_BITS}
+    used = {spec.translation_key for spec in bitfields.ALL_BITS} | computed_sensors
     assert declared == used

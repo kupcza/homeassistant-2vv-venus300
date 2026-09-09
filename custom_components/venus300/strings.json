@@ -105,6 +105,7 @@
       "sw_error2_raw": { "name": "Software error 2 (raw)" }
     },
     "binary_sensor": {
+      "freecooling_conditions_met": { "name": "Freecooling conditions met" },
       "manual_mode_active": { "name": "Manual mode active" },
       "dcv_mode_active": { "name": "DCV mode active" },
       "fire_mode_active": { "name": "Fire mode active" },
