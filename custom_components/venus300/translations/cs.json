@@ -20,7 +20,6 @@
   "entity": {
     "switch": {
       "power": { "name": "Napájení" },
-      "freecooling_mode": { "name": "Režim Freecooling" },
       "freecooling_enable": { "name": "Freecooling povolen" },
       "filter_working_hours_enabled": { "name": "Sledování filtru podle hodin provozu" }
     },

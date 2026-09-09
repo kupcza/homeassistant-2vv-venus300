@@ -5,6 +5,29 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.9.0] - 2026-09-09
+
+### Removed (breaking)
+
+- `switch.freecooling_mode`: repeated live testing confirmed writing to
+  its underlying register (SHARE `FreecoolingMode`, 21010) does not
+  reliably work — the unit's own firmware overwrites it before the next
+  readback, every time. Converting it to a read-only sensor wasn't a
+  better option either, since that register almost always reads `0`
+  regardless of real Freecooling status, making it actively misleading
+  either way. Removed rather than ship something that looks like a
+  working control but isn't.
+
+  Use `binary_sensor.freecooling_active` (real, confirmed status),
+  `binary_sensor.freecooling_conditions_met` (would it run right now,
+  added in 0.8.0), and `switch.freecooling_enable` (the master enable)
+  instead — together they cover what this switch never reliably did.
+  `FREECOOLING_MODE` remains defined in `registers.py` for reference.
+
+If you had automations calling `switch.turn_on`/`turn_off` on
+`switch.freecooling_mode`, remove them — they were never having a
+confirmed effect anyway.
+
 ## [0.8.0] - 2026-09-09
 
 ### Added

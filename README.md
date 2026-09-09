@@ -29,7 +29,6 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | Platform | Entity | Register | Notes |
 |---|---|---|---|
 | switch | Power | holding 21000 | on/off |
-| switch | Freecooling mode | holding 21010 | on/off, *requests* freecooling — see below |
 | switch | Freecooling enabled | holding 20013 | on/off, config category, master enable — see below |
 | switch | Filter hour-based tracking | holding 25018 | on/off, config category — see below |
 | button | Boost | holding 21008 | press for a self-clearing timed boost — see below |
@@ -72,16 +71,18 @@ the original `modbus.yaml` this project was migrated from.
 
 ### Freecooling: what actually controls it (confirmed by live testing)
 
-**`switch.freecooling_mode` (SHARE `FreecoolingMode`, register 21010) does
-not reliably work as a manual on-demand override.** Confirmed by repeated
-live testing against a real unit: writing `1` succeeds at the protocol
-level (no Modbus error; the device even echoes the value back in the write
-response) — but an immediate readback already shows `0` again, every time,
-even with every other condition below satisfied. The unit's own firmware
-appears to recompute and overwrite this register on its own control loop,
-faster than any external write can stick. Don't rely on this switch for
-on-demand control; the automatic scheduler below is what's actually
-confirmed to work.
+**There's no manual on-demand override, deliberately.** SHARE's
+`FreecoolingMode` request register (21010) exists in the vendor's datasheet
+but isn't exposed as an entity here — confirmed by repeated live testing
+against a real unit that writing `1` to it doesn't reliably work: it
+succeeds at the protocol level (no Modbus error; the device even echoes the
+value back in the write response) — but an immediate readback already
+shows `0` again, every time, even with every other condition below
+satisfied. The unit's own firmware appears to recompute and overwrite this
+register on its own control loop, faster than any external write can
+stick. It's kept in `registers.py` for reference, but shipping it as a
+switch would just be misleading. The automatic scheduler below is what's
+actually confirmed to work.
 
 **What the automatic scheduler evaluates** (four conditions, all exposed
 as entities):
@@ -103,8 +104,7 @@ as entities):
 
 Check `binary_sensor.freecooling_active` (the unit's real, confirmed status)
 and `binary_sensor.prefreecooling_active` (a transitional state before it
-fully engages) — these reflect ground truth from direct register reads,
-independent of whatever `switch.freecooling_mode` shows.
+fully engages) — these reflect ground truth from direct register reads.
 
 **`binary_sensor.freecooling_conditions_met`** answers "would Freecooling
 run right now, ignoring whether it's enabled" — conditions 2–4 above,
@@ -313,8 +313,9 @@ sheet `STATUS_AHU`) is decoded into its own diagnostic `binary_sensor` in
 entities for troubleshooting. A handful of bits are intentionally omitted:
 
 - `ON/OFF` (global status bit 0) — already covered by the `power` switch.
-  (`Freecooling`, bit 8, is *not* omitted — see above, it's the real status,
-  distinct from the `freecooling_mode` request switch.)
+  (`Freecooling`, bit 8, is *not* omitted — see above, it's the real,
+  confirmed status, distinct from and more reliable than SHARE's
+  `FreecoolingMode` request register, which isn't exposed as an entity.)
 - `CAV` / `VAV` (global status bits 2/3) — documented `Min == Max == 0` on
   this firmware, i.e. never set.
 - Water-heater and AQS-sensor bits — this unit has neither fitted (per the

@@ -20,7 +20,6 @@
   "entity": {
     "switch": {
       "power": { "name": "Alimentare" },
-      "freecooling_mode": { "name": "Mod Freecooling" },
       "freecooling_enable": { "name": "Freecooling activat" },
       "filter_working_hours_enabled": { "name": "Urmărire filtru după ore de funcționare" }
     },

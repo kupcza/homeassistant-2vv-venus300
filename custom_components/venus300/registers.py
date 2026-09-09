@@ -263,12 +263,15 @@ BOOST_MODE = Register(
 FREECOOLING_MODE = Register(
     "freecooling_mode", 21010, RegisterKind.HOLDING, writable=True
 )  # doc 21011, SHARE: FreecoolingMode, manual activation request.
-# CONFIRMED (live testing against a real unit) that writing this does NOT
-# reliably override the unit's own scheduler: the write succeeds at the
-# protocol level, but an immediate readback already shows 0 again, even
-# with freecooling_enable/threshold/season/hour-window all satisfied. The
-# automatic scheduler (see the other freecooling_* registers) is what
-# actually works — see README's "Freecooling: what actually controls it".
+# Deliberately NOT exposed as an entity: CONFIRMED (live testing against a
+# real unit) that writing this does not reliably override the unit's own
+# scheduler -- the write succeeds at the protocol level, but an immediate
+# readback already shows 0 again, even with
+# freecooling_enable/threshold/season/hour-window all satisfied. Kept here
+# only for reference/future use; the automatic scheduler (the other
+# freecooling_* registers) plus binary_sensor.freecooling_active and
+# binary_sensor.freecooling_conditions_met are what's actually useful --
+# see README's "Freecooling: what actually controls it".
 FILTER_CLOGGED_TIMER_RESET = Register(
     "filter_clogged_timer_reset", 21015, RegisterKind.HOLDING, writable=True
 )  # doc 21016, SHARE: FilterClogedTimerReset — write 1 after replacing a filter

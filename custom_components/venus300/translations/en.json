@@ -20,7 +20,6 @@
   "entity": {
     "switch": {
       "power": { "name": "Power" },
-      "freecooling_mode": { "name": "Freecooling mode" },
       "freecooling_enable": { "name": "Freecooling enabled" },
       "filter_working_hours_enabled": { "name": "Filter hour-based tracking" }
     },

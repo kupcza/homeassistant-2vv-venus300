@@ -20,7 +20,6 @@
   "entity": {
     "switch": {
       "power": { "name": "Güç" },
-      "freecooling_mode": { "name": "Freecooling Modu" },
       "freecooling_enable": { "name": "Freecooling Etkin" },
       "filter_working_hours_enabled": { "name": "Filtre Çalışma Saati Takibi" }
     },

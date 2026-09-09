@@ -17,7 +17,6 @@ from .modbus_client import Venus300ModbusError
 from .registers import (
     FILTER_WORKING_HOURS_ENABLED,
     FREECOOLING_ENABLE,
-    FREECOOLING_MODE,
     SWITCH_ON,
     Register,
 )
@@ -33,7 +32,6 @@ async def async_setup_entry(
     async_add_entities(
         [
             Venus300Switch(coordinator, entry, SWITCH_ON, "power"),
-            Venus300Switch(coordinator, entry, FREECOOLING_MODE, "freecooling_mode"),
             Venus300Switch(
                 coordinator,
                 entry,

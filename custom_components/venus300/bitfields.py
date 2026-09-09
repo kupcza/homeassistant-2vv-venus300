@@ -12,12 +12,13 @@ see the note at the top of modbus.yaml). bit0 (ON/OFF) of GLOBAL_STATUS_RAW
 is also omitted: it duplicates the `power` switch, which already reads the
 same state from the SHARE control block.
 
-bit8 (Freecooling) is deliberately *not* treated as a duplicate of the
-`freecooling_mode` switch: that switch only writes SHARE's FreecoolingMode
-*request* register (21010/doc 21011). Whether the unit actually enters
-freecooling also depends on FREECOOLING_ENABLE and the allowed-hours window
-in FREECOOLING_BLOCK (see registers.py) — this bit reflects the real,
-resulting state, which can legitimately differ from the request.
+bit8 (Freecooling) reflects the unit's real, resulting state, which can
+legitimately differ from SHARE's FreecoolingMode *request* register
+(21010/doc 21011, registers.py's FREECOOLING_MODE) — confirmed by live
+testing that writing that register doesn't reliably work anyway, which is
+why it isn't exposed as an entity at all. Whether the unit actually enters
+freecooling depends on FREECOOLING_ENABLE and the allowed-hours window in
+FREECOOLING_BLOCK (see registers.py and freecooling_conditions.py).
 """
 
 from __future__ import annotations
