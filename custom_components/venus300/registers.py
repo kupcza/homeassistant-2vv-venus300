@@ -241,7 +241,13 @@ BOOST_MODE = Register(
 # in Home Assistant (see switch.py), so this isn't polled every cycle.
 FREECOOLING_MODE = Register(
     "freecooling_mode", 21010, RegisterKind.HOLDING, writable=True
-)  # doc 21011, SHARE: FreecoolingMode, manual activation request
+)  # doc 21011, SHARE: FreecoolingMode, manual activation request.
+# CONFIRMED (live testing against a real unit) that writing this does NOT
+# reliably override the unit's own scheduler: the write succeeds at the
+# protocol level, but an immediate readback already shows 0 again, even
+# with freecooling_enable/threshold/season/hour-window all satisfied. The
+# automatic scheduler (see the other freecooling_* registers) is what
+# actually works — see README's "Freecooling: what actually controls it".
 FILTER_CLOGGED_TIMER_RESET = Register(
     "filter_clogged_timer_reset", 21015, RegisterKind.HOLDING, writable=True
 )  # doc 21016, SHARE: FilterClogedTimerReset — write 1 after replacing a filter

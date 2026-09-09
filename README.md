@@ -69,26 +69,112 @@ Register addresses are wire (0-based) addresses, one less than the
 "PLC Addresses - BASE1" numbers in `MODBUS_V1_FW166_167.xlsx`; this mirrors
 the original `modbus.yaml` this project was migrated from.
 
-### Why "Freecooling mode" alone might not do anything
+### Freecooling: what actually controls it (confirmed by live testing)
 
-The `Freecooling mode` switch only writes SHARE's `FreecoolingMode` request
-register (21010) — it asks the unit to freecool. Whether the unit actually
-does depends on three more things, all now exposed as separate entities:
+**`switch.freecooling_mode` (SHARE `FreecoolingMode`, register 21010) does
+not reliably work as a manual on-demand override.** Confirmed by repeated
+live testing against a real unit: writing `1` succeeds at the protocol
+level (no Modbus error; the device even echoes the value back in the write
+response) — but an immediate readback already shows `0` again, every time,
+even with every other condition below satisfied. The unit's own firmware
+appears to recompute and overwrite this register on its own control loop,
+faster than any external write can stick. Don't rely on this switch for
+on-demand control; the automatic scheduler below is what's actually
+confirmed to work.
+
+**What the automatic scheduler evaluates** (four conditions, all exposed
+as entities):
 
 1. **`Freecooling enabled`** (switch, holding 20013) — a master enable at
-   the SERVICE level. If this is off, the request switch above does nothing.
-2. **`Freecooling temperature threshold`** (number, holding 20015, default
-   20 °C) — outdoor temperature must be below this.
+   the SERVICE level.
+2. **`Freecooling temperature threshold`** (number, holding 20015) —
+   outdoor temperature must be below this. Confirmed hysteresis: it can
+   stay active briefly even after outdoor temp ticks slightly *above* the
+   threshold, rather than dropping out the instant it's crossed.
 3. **The allowed-hours/season window** (8 number entities, holding
-   20016–20023) — by factory default, freecooling is only permitted
-   **June 1 – September 1, 20:00–06:00**. Outside that window the unit
-   ignores freecooling requests entirely, regardless of the two settings
-   above.
+   20016–20023). **Confirmed empirically**: the daily hour window wraps
+   past midnight — evaluated as `now ≥ on_hour OR now < off_hour`, not a
+   same-day range. So `freecooling_on_hour = 22`, `freecooling_off_hour = 6`
+   (an overnight window) is normal and correct — `on_hour` being
+   numerically larger than `off_hour` is expected for that shape, not a
+   misconfiguration.
+4. A hardware/mechanism precondition — see below.
 
-Check `binary_sensor.freecooling_active` (the unit's actual status, distinct
-from the request) and `binary_sensor.prefreecooling_active` (a transitional
-state before freecooling fully engages) to see what the unit is really
-doing.
+Check `binary_sensor.freecooling_active` (the unit's real, confirmed status)
+and `binary_sensor.prefreecooling_active` (a transitional state before it
+fully engages) — these reflect ground truth from direct register reads,
+independent of whatever `switch.freecooling_mode` shows.
+
+### The actual cooling mechanism: fan control, not a bypass damper
+
+`sensor.bypass_type` reading "none" on units like this one is **not
+necessarily a misconfiguration** — confirmed by directly observing a real
+active Freecooling cycle:
+
+```
+freecooling_active = True,  bypass_position = 100% (static/non-functional)
+inlet_fan_power  = 60%   (supply fan running)
+outlet_fan_power =  0%   (exhaust fan OFF)
+
+TempEXT1 (raw outside air)        = 18.6°C
+TempEXT2 (supply air TO house)    = 19.8°C   (+1.2°C — barely tempered)
+TempINT1 (extract air FROM house) = 25.1°C
+TempINT2 (exhaust, stagnant)      = 19.3°C   (not actively flowing)
+```
+
+This unit's recuperator is a **plate exchanger** (FACTORY_SET `RecupType`
+= 1 — a fixed core with no moving parts, unlike a rotary wheel which could
+just stop spinning to achieve the same effect). Instead, when Freecooling
+engages, the unit **stops the exhaust fan entirely** while keeping the
+supply fan running. Heat exchangers need continuous flow on *both* sides
+to keep transferring heat — the same reason a car radiator stops cooling
+anything if the coolant flow stops, even with air still blowing through
+it. With the exhaust side stalled, incoming outside air passes through the
+core nearly untempered (confirmed: only ~1°C rise, consistent with duct/
+casing thermal mass rather than active exchange) — achieving the same
+practical result as a bypass damper, without needing one.
+
+**To verify real cooling is happening** (not just the status bit), compare
+`sensor.temperature_unit_to_house` to `sensor.temperature_outside_to_unit`
+during an active cycle — they should be close (within a couple °C). A
+large gap would mean the exchanger is still actively tempering the air
+despite the status bit, i.e. not real freecooling.
+
+### Overpressure consideration (supply-only operation)
+
+Since only the supply fan runs during Freecooling, positive pressure
+builds up in the house relative to outside. Confirmed **not** fully
+sealed off, though: `Status_DO_2_Flap_outlet` (the exhaust duct's own
+motorized flap, a separate register from the fan) reads **OPEN** even
+while `outlet_fan_power = 0%`. So the exhaust path stays physically open —
+positive pressure has a passive relief route directly back through the
+idle exhaust fan/duct, in addition to normal building leakage.
+
+Generally not a concern for typical homes, but worth being aware of if:
+- Your house is very airtight (e.g. Passive House level) — less natural
+  leakage means more noticeable pressure (doors harder to close,
+  whistling at gaps).
+- You have an **open-flue** (non-room-sealed) combustion appliance —
+  positive pressure can push exhaust gases back down a flue. Room-sealed/
+  balanced-flue appliances aren't affected.
+
+None of this is configurable via Modbus — it's how the firmware
+implements Freecooling on this hardware variant.
+
+### Debugging Freecooling yourself
+
+`scripts/debug_freecooling.py` — standalone, no Home Assistant needed.
+Dumps every Freecooling-relevant register plus the unit's own real-time
+clock (the schedule is evaluated against the unit's clock, not your wall
+clock — worth checking they actually agree), evaluates each precondition
+against live values, and can optionally activate Freecooling and watch
+the result for ~30s:
+
+```
+pip install pymodbus
+python3 scripts/debug_freecooling.py [host] [port] [slave_id]              # read-only
+python3 scripts/debug_freecooling.py [host] [port] [slave_id] --activate   # also writes + watches
+```
 
 ### Self-clearing Boost button — two different timers, on purpose
 

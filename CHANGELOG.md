@@ -5,6 +5,33 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.1] - 2026-09-09
+
+### Documentation
+
+- Documented findings from live debugging a real unit's Freecooling
+  behavior (see README):
+  - **Confirmed** `switch.freecooling_mode` does not reliably work as a
+    manual override — writes succeed at the protocol level but are
+    overwritten by the unit's own scheduler before the next readback,
+    every time. Noted directly in `registers.py` next to
+    `FREECOOLING_MODE`.
+  - **Confirmed** the daily allowed-hours window wraps past midnight
+    (`now ≥ on_hour OR now < off_hour`) — an overnight window like
+    22:00→06:00 is normal, not a misconfiguration.
+  - **Confirmed** `bypass_type = none` is not necessarily a
+    misconfiguration: on a plate-exchanger unit, Freecooling is achieved
+    by stopping the exhaust fan (heat exchange needs flow on both sides)
+    rather than a physical bypass damper, and the exhaust flap stays
+    open (not sealed) even with its fan off.
+- Added `scripts/debug_freecooling.py`, a standalone (no Home Assistant
+  needed) diagnostic that dumps every Freecooling-relevant register plus
+  the unit's own real-time clock, evaluates each precondition, and can
+  optionally activate Freecooling and watch the result live. Read-only
+  by default; `--activate` opts into the live write+watch.
+
+No functional changes to the integration itself.
+
 ## [0.6.0] - 2026-09-08
 
 ### Changed (breaking)
