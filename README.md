@@ -34,6 +34,7 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | button | Boost | holding 21008 | press for a self-clearing timed boost — see below |
 | button | Reset filter usage hours | holding 21015 | press after replacing a filter — see below |
 | button | Sync unit clock now | holding 16999–17006 | on-demand clock sync — see below |
+| button | Force Freecooling now | holding 20018–20019 | edge-triggers Freecooling's start condition — see below |
 | number | Fan power setpoint | holding 21001 | 20–100 %, step 10, raw is ‰ — "off" is `switch.power` |
 | number | Boost duration (HA button only) | *(computed in HA)* | 1–60 min, default 5, config category — see below |
 | number | Boost duration (unit, all triggers) | holding 20011 | 1–60 min, default 3, config category — see below |
@@ -123,6 +124,45 @@ All four are computed in `freecooling_conditions.py` using the unit's own
 real-time clock (also newly exposed, read every poll — see
 `registers.py`'s `TIME_BLOCK`), not Home Assistant's, since that's what
 the scheduler itself is confirmed to use.
+
+### Manually triggering Freecooling (edge-triggered, not level-triggered)
+
+**Confirmed live, and it explains an anomaly seen earlier in this
+project's history:** all four conditions above can read `True`
+simultaneously — enabled, temperature below threshold, in season, inside
+the allowed hour window — and Freecooling will still *not* start, and
+stays that way indefinitely even while polling continuously. Toggling
+`freecooling_enable` off and back on doesn't help either.
+
+The reason: the unit's scheduler doesn't continuously re-evaluate "are all
+conditions true right now" as a level check. It only starts Freecooling at
+the moment its own clock **crosses** `freecooling_on_hour:freecooling_on_min`
+while the other conditions already hold — an edge trigger, not a level
+check. If you're already inside the window when you enable it, or a
+condition becomes true while already inside the window, that crossing has
+already happened and won't happen again until the next allowed-window
+start (potentially a full day away, or never, depending on wrap
+semantics). Confirmed by direct observation: moving `freecooling_on_hour`/
+`freecooling_on_min` to a time slightly ahead of the unit's current clock,
+then waiting for the unit's own clock to reach it, reliably starts
+Freecooling every time — even though nothing else changed.
+
+**`button.force_freecooling`** automates exactly this workaround, since
+the documented manual override (`FreecoolingMode`, see above) never
+sticks:
+
+1. Snapshots the current `freecooling_on_hour`/`freecooling_on_min`.
+2. Writes the unit's current time + 1 minute in their place, so the next
+   tick of the unit's own clock crosses the boundary.
+3. After 2 minutes (long enough for that crossing and for Freecooling to
+   latch on), writes the original start time back.
+
+Restoring the start time does **not** stop an already-engaged Freecooling
+cycle — only the (by-then long-passed) start boundary is reverted; the
+unit's normal end-of-window/season/temperature conditions still govern
+when it actually stops. `freecooling_enable` must still be on and the
+temperature/season conditions must already hold — this button only forces
+the *timing* condition, not the others. See `freecooling_force.py`.
 
 ### The actual cooling mechanism: fan control, not a bypass damper
 

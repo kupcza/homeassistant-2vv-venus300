@@ -26,6 +26,7 @@
     "button": {
       "filter_timer_reset": { "name": "Filtre Kullanım Saatini Sıfırla" },
       "sync_unit_clock": { "name": "Ünite Saatini Şimdi Senkronize Et" },
+      "force_freecooling": { "name": "Freecooling'i Şimdi Zorla" },
       "boost": { "name": "Boost" }
     },
     "number": {

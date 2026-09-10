@@ -13,14 +13,18 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_call_later
 
-from . import Venus300ConfigEntry, time_sync
+from . import Venus300ConfigEntry, freecooling_force, time_sync
 from .coordinator import Venus300Coordinator
 from .entity import Venus300Entity
 from .modbus_client import Venus300ModbusError
 from .registers import (
+    ACTUAL_HOUR,
+    ACTUAL_MIN,
     BOOST_MODE,
     FAN_POWER_SETPOINT,
     FILTER_CLOGGED_TIMER_RESET,
+    FREECOOLING_ON_HOUR,
+    FREECOOLING_ON_MIN,
     SWITCH_ON,
     encode_value,
 )
@@ -40,6 +44,7 @@ async def async_setup_entry(
             Venus300FilterTimerResetButton(coordinator, entry),
             Venus300BoostButton(coordinator, entry),
             Venus300SyncClockButton(coordinator, entry),
+            Venus300ForceFreecoolingButton(coordinator, entry),
         ]
     )
 
@@ -192,4 +197,96 @@ class Venus300SyncClockButton(Venus300Entity, ButtonEntity):
             await time_sync.async_force_sync(self.coordinator.client)
         except Venus300ModbusError as err:
             raise HomeAssistantError(str(err)) from err
+        await self.coordinator.async_request_refresh()
+
+
+class Venus300ForceFreecoolingButton(Venus300Entity, ButtonEntity):
+    """Force Freecooling to engage right now.
+
+    Freecooling's start condition is edge-triggered on the unit's own
+    clock crossing freecooling_on_hour:freecooling_on_min -- confirmed
+    live, it is NOT a level check re-evaluated continuously (see
+    freecooling_force.py and README). The manual override register
+    (FreecoolingMode) never sticks, so this is the only known way to
+    trigger it on demand: momentarily move the allowed start time to just
+    past the unit's current clock and let that edge fire.
+
+    On first press, snapshots freecooling_on_hour/freecooling_on_min and
+    writes (unit's current time + 1 minute) in their place. After a fixed
+    delay -- long enough for the unit's clock to cross that new start time
+    and Freecooling to latch on -- the original start time is written
+    back. This does NOT turn Freecooling off: once engaged it keeps
+    running per its normal end-of-window/season/temperature conditions;
+    only the (by-then-passed) start boundary is restored.
+
+    Still requires freecooling_enable to be on and the temperature/season
+    conditions to already hold -- see binary_sensor.freecooling_conditions_met.
+    Pressing again before the restore delay elapses re-arms it against a
+    fresh current time without re-snapshotting (the original start time is
+    preserved throughout, like the boost button's pre-boost state).
+    """
+
+    _attr_translation_key = "force_freecooling"
+
+    _RESTORE_DELAY_SECONDS = 120
+
+    def __init__(self, coordinator: Venus300Coordinator, entry: Venus300ConfigEntry) -> None:
+        """Set up the force button."""
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_force_freecooling"
+        self._cancel_timer: Callable[[], None] | None = None
+        self._pre_force_state: dict[str, Any] | None = None
+
+    async def async_press(self) -> None:
+        """Nudge the start time to just past now and (re)arm the restore."""
+        if self._pre_force_state is None:
+            self._pre_force_state = {
+                FREECOOLING_ON_HOUR.key: self.coordinator.data.get(FREECOOLING_ON_HOUR.key),
+                FREECOOLING_ON_MIN.key: self.coordinator.data.get(FREECOOLING_ON_MIN.key),
+            }
+        hour, minute = freecooling_force.next_minute(
+            self.coordinator.data[ACTUAL_HOUR.key], self.coordinator.data[ACTUAL_MIN.key]
+        )
+        try:
+            await self.coordinator.client.write_register(FREECOOLING_ON_HOUR, hour)
+            await self.coordinator.client.write_register(FREECOOLING_ON_MIN, minute)
+        except Venus300ModbusError as err:
+            raise HomeAssistantError(str(err)) from err
+        await self.coordinator.async_request_refresh()
+        self._schedule_restore()
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Cancel any pending restore callback."""
+        self._cancel_pending_timer()
+
+    def _schedule_restore(self) -> None:
+        """(Re)schedule the restore-original-start-time callback."""
+        self._cancel_pending_timer()
+        self._cancel_timer = async_call_later(
+            self.hass, self._RESTORE_DELAY_SECONDS, self._async_restore
+        )
+
+    def _cancel_pending_timer(self) -> None:
+        """Cancel a scheduled restore callback, if any."""
+        if self._cancel_timer is not None:
+            self._cancel_timer()
+            self._cancel_timer = None
+
+    async def _async_restore(self, _now: Any) -> None:
+        """Write back the original start time once the edge has had time to fire."""
+        self._cancel_timer = None
+        snapshot, self._pre_force_state = self._pre_force_state, None
+        if snapshot is None:
+            return
+        try:
+            for register, value in (
+                (FREECOOLING_ON_HOUR, snapshot.get(FREECOOLING_ON_HOUR.key)),
+                (FREECOOLING_ON_MIN, snapshot.get(FREECOOLING_ON_MIN.key)),
+            ):
+                if value is not None:
+                    await self.coordinator.client.write_register(
+                        register, encode_value(register, value)
+                    )
+        except Venus300ModbusError as err:
+            _LOGGER.error("Failed to restore freecooling start time: %s", err)
         await self.coordinator.async_request_refresh()

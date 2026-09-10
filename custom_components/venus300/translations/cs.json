@@ -26,6 +26,7 @@
     "button": {
       "filter_timer_reset": { "name": "Reset počtu hodin filtru" },
       "sync_unit_clock": { "name": "Synchronizovat hodiny jednotky nyní" },
+      "force_freecooling": { "name": "Vynutit Freecooling nyní" },
       "boost": { "name": "Boost" }
     },
     "number": {

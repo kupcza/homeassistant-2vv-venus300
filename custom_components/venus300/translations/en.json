@@ -26,6 +26,7 @@
     "button": {
       "filter_timer_reset": { "name": "Reset filter usage hours" },
       "sync_unit_clock": { "name": "Sync unit clock now" },
+      "force_freecooling": { "name": "Force Freecooling now" },
       "boost": { "name": "Boost" }
     },
     "number": {

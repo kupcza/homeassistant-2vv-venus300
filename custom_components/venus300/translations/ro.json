@@ -26,6 +26,7 @@
     "button": {
       "filter_timer_reset": { "name": "Resetare ore de utilizare filtru" },
       "sync_unit_clock": { "name": "Sincronizează ceasul unității acum" },
+      "force_freecooling": { "name": "Forțează Freecooling acum" },
       "boost": { "name": "Boost" }
     },
     "number": {

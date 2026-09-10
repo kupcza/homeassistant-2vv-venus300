@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.11.0] - 2026-09-10
+
+### Added
+
+- `button.force_freecooling`: manually triggers Freecooling on demand.
+  Confirmed live that Freecooling's start condition is **edge-triggered**
+  on the unit's own clock crossing `freecooling_on_hour:freecooling_on_min`
+  — not a level check re-evaluated continuously — which explains a
+  previously unresolved anomaly where every tracked condition read `True`
+  simultaneously yet Freecooling never started. This button snapshots the
+  configured start time, nudges it to just past the unit's current clock
+  to fire that edge, then restores the original start time once it's had
+  time to latch on. See README's "Manually triggering Freecooling" section
+  and the new `freecooling_force.py`.
+
 ## [0.10.0] - 2026-09-10
 
 ### Added
