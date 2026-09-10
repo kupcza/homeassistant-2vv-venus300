@@ -5,6 +5,25 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.9.1] - 2026-09-10
+
+### Added
+
+- Three new diagnostic binary sensors breaking `freecooling_conditions_met`
+  down into its individual parts, so it's obvious at a glance which
+  precondition is failing instead of digging into attributes:
+  `binary_sensor.freecooling_temperature_met`,
+  `binary_sensor.freecooling_season_met`,
+  `binary_sensor.freecooling_hour_window_met`.
+- Translated to Czech, Turkish, and Romanian.
+
+### Changed
+
+- `binary_sensor.freecooling_conditions_met` no longer exposes
+  `temperature_ok`/`season_ok`/`hour_window_ok` as attributes — that
+  information moved to the three dedicated sensors above. The combined
+  sensor itself (the overall AND of all three) is unchanged.
+
 ## [0.9.0] - 2026-09-09
 
 ### Removed (breaking)

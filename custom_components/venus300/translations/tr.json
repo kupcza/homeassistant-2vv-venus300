@@ -105,6 +105,9 @@
     },
     "binary_sensor": {
       "freecooling_conditions_met": { "name": "Freecooling Koşulları Karşılandı" },
+      "freecooling_temperature_met": { "name": "Freecooling Sıcaklık Koşulu" },
+      "freecooling_season_met": { "name": "Freecooling Sezon Koşulu" },
+      "freecooling_hour_window_met": { "name": "Freecooling Saat Aralığı Koşulu" },
       "manual_mode_active": { "name": "Manuel Mod Aktif" },
       "dcv_mode_active": { "name": "DCV Modu Aktif" },
       "fire_mode_active": { "name": "Yangın Modu Aktif" },

@@ -105,6 +105,9 @@
     },
     "binary_sensor": {
       "freecooling_conditions_met": { "name": "Podmínky pro Freecooling splněny" },
+      "freecooling_temperature_met": { "name": "Freecooling – teplotní podmínka" },
+      "freecooling_season_met": { "name": "Freecooling – sezónní podmínka" },
+      "freecooling_hour_window_met": { "name": "Freecooling – časová podmínka" },
       "manual_mode_active": { "name": "Aktivní ruční režim" },
       "dcv_mode_active": { "name": "Aktivní režim DCV" },
       "fire_mode_active": { "name": "Aktivní požární režim" },

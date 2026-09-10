@@ -64,6 +64,7 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | sensor | Global status / status 2 / error 1 / error 2 (raw) | input 14999–15002 | diagnostic, raw 16-bit words (see below) |
 | binary_sensor | 40 decoded status/error bits | input 14999–15002 | diagnostic; see `bitfields.py` |
 | binary_sensor | Freecooling conditions met | *(computed in HA)* | diagnostic; excludes `freecooling_enable` — see below |
+| binary_sensor | Freecooling temperature/season/hour window condition (×3) | *(computed in HA)* | diagnostic; which specific condition is failing — see below |
 
 Register addresses are wire (0-based) addresses, one less than the
 "PLC Addresses - BASE1" numbers in `MODBUS_V1_FW166_167.xlsx`; this mirrors
@@ -108,14 +109,18 @@ fully engages) — these reflect ground truth from direct register reads.
 
 **`binary_sensor.freecooling_conditions_met`** answers "would Freecooling
 run right now, ignoring whether it's enabled" — conditions 2–4 above,
-deliberately excluding `freecooling_enable` (check that separately). Its
-attributes (`temperature_ok`, `season_ok`, `hour_window_ok`) break down
-which specific condition is or isn't currently satisfied, for at-a-glance
-troubleshooting instead of comparing several entities by hand. Computed in
-`freecooling_conditions.py` using the unit's own real-time clock (also
-newly exposed, read every poll — see `registers.py`'s `TIME_BLOCK`), not
-Home Assistant's, since that's what the scheduler itself is confirmed to
-use.
+deliberately excluding `freecooling_enable` (check that separately). If
+it's off, check the three individual condition sensors to see exactly
+which one is failing, instead of comparing several entities by hand:
+
+- `binary_sensor.freecooling_temperature_met`
+- `binary_sensor.freecooling_season_met`
+- `binary_sensor.freecooling_hour_window_met`
+
+All four are computed in `freecooling_conditions.py` using the unit's own
+real-time clock (also newly exposed, read every poll — see
+`registers.py`'s `TIME_BLOCK`), not Home Assistant's, since that's what
+the scheduler itself is confirmed to use.
 
 ### The actual cooling mechanism: fan control, not a bypass damper
 

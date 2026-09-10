@@ -105,6 +105,9 @@
     },
     "binary_sensor": {
       "freecooling_conditions_met": { "name": "Condiții Freecooling îndeplinite" },
+      "freecooling_temperature_met": { "name": "Freecooling – condiție temperatură" },
+      "freecooling_season_met": { "name": "Freecooling – condiție sezon" },
+      "freecooling_hour_window_met": { "name": "Freecooling – condiție interval orar" },
       "manual_mode_active": { "name": "Mod manual activ" },
       "dcv_mode_active": { "name": "Mod DCV activ" },
       "fire_mode_active": { "name": "Mod incendiu activ" },

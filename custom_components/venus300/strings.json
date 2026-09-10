@@ -105,6 +105,9 @@
     },
     "binary_sensor": {
       "freecooling_conditions_met": { "name": "Freecooling conditions met" },
+      "freecooling_temperature_met": { "name": "Freecooling temperature condition" },
+      "freecooling_season_met": { "name": "Freecooling season condition" },
+      "freecooling_hour_window_met": { "name": "Freecooling hour window condition" },
       "manual_mode_active": { "name": "Manual mode active" },
       "dcv_mode_active": { "name": "DCV mode active" },
       "fire_mode_active": { "name": "Fire mode active" },

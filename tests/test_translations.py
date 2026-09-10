@@ -79,7 +79,12 @@ def test_binary_sensor_translation_keys_match_bitfields_plus_computed_sensors():
     # decoded from a status-word bit (see freecooling_conditions.py) --
     # listed explicitly here rather than pattern-matched from the module,
     # since there's no dataclass tuple to introspect for those.
-    computed_sensors = {"freecooling_conditions_met"}
+    computed_sensors = {
+        "freecooling_conditions_met",
+        "freecooling_temperature_met",
+        "freecooling_season_met",
+        "freecooling_hour_window_met",
+    }
 
     declared = set(_load_strings()["entity"]["binary_sensor"])
     used = {spec.translation_key for spec in bitfields.ALL_BITS} | computed_sensors
