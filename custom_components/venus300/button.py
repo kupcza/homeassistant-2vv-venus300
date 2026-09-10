@@ -209,7 +209,9 @@ class Venus300ForceFreecoolingButton(Venus300Entity, ButtonEntity):
     freecooling_force.py and README). The manual override register
     (FreecoolingMode) never sticks, so this is the only known way to
     trigger it on demand: momentarily move the allowed start time to just
-    past the unit's current clock and let that edge fire.
+    past the unit's current clock and let that edge fire. Confirmed
+    working end-to-end on a real unit -- pressing it reliably engages
+    Freecooling within the restore delay below.
 
     On first press, snapshots freecooling_on_hour/freecooling_on_min and
     writes (unit's current time + 1 minute) in their place. After a fixed

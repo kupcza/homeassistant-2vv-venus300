@@ -149,7 +149,8 @@ Freecooling every time — even though nothing else changed.
 
 **`button.force_freecooling`** automates exactly this workaround, since
 the documented manual override (`FreecoolingMode`, see above) never
-sticks:
+sticks. **Confirmed working end-to-end on a real unit** — pressing it
+reliably engages Freecooling within the 2-minute window:
 
 1. Snapshots the current `freecooling_on_hour`/`freecooling_on_min`.
 2. Writes the unit's current time + 1 minute in their place, so the next

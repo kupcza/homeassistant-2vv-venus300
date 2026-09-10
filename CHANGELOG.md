@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   configured start time, nudges it to just past the unit's current clock
   to fire that edge, then restores the original start time once it's had
   time to latch on. See README's "Manually triggering Freecooling" section
-  and the new `freecooling_force.py`.
+  and the new `freecooling_force.py`. **Confirmed working end-to-end on a
+  real unit** shortly after release.
 
 ## [0.10.0] - 2026-09-10
 
