@@ -25,6 +25,7 @@
     },
     "button": {
       "filter_timer_reset": { "name": "Resetare ore de utilizare filtru" },
+      "sync_unit_clock": { "name": "Sincronizează ceasul unității acum" },
       "boost": { "name": "Boost" }
     },
     "number": {
@@ -61,6 +62,7 @@
       "filter_usage_hours": { "name": "Utilizare filtru (estimat, ore)" },
       "filter_usage_percent": { "name": "Utilizare filtru % (estimat)" },
       "filter_usage_reset_at": { "name": "Ultima resetare utilizare filtru" },
+      "unit_clock_drift": { "name": "Decalaj ceas unitate" },
       "bypass_position": { "name": "Poziție bypass" },
       "bypass_type": {
         "name": "Tip bypass",

@@ -5,6 +5,27 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] - 2026-09-10
+
+### Added
+
+- Automatic clock sync: the unit's own real-time clock (`TIME` sheet) was
+  found sitting at its factory default (`2000-01-01 00:00:00`, confirmed
+  live — never set) and drifting freely. Since every schedule-based
+  feature (Freecooling's season/hour window) is evaluated against this
+  clock, not Home Assistant's, this integration now corrects it
+  automatically: once when it starts, and every 24h after that, whenever
+  drift exceeds 60 seconds. Uses `TIME_DRIVER`'s `Set*` holding registers
+  plus `SetFlag=1` to commit — confirmed live that the flag self-clears
+  back to `0` once applied, unlike `FreecoolingMode`'s broken behavior.
+- `sensor.unit_clock_drift` — current offset in seconds (positive = unit
+  ahead, negative = behind).
+- `button.sync_unit_clock` — forces an immediate sync on demand (e.g.
+  right after a power outage).
+- New `time_sync.py` module with the sync/drift logic, and
+  `tests/test_time_sync.py` covering drift calculation and the
+  threshold-gated auto-sync.
+
 ## [0.9.1] - 2026-09-10
 
 ### Added

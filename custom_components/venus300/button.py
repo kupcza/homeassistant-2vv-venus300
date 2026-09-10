@@ -13,7 +13,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_call_later
 
-from . import Venus300ConfigEntry
+from . import Venus300ConfigEntry, time_sync
 from .coordinator import Venus300Coordinator
 from .entity import Venus300Entity
 from .modbus_client import Venus300ModbusError
@@ -39,6 +39,7 @@ async def async_setup_entry(
         [
             Venus300FilterTimerResetButton(coordinator, entry),
             Venus300BoostButton(coordinator, entry),
+            Venus300SyncClockButton(coordinator, entry),
         ]
     )
 
@@ -164,3 +165,31 @@ class Venus300BoostButton(Venus300Entity, ButtonEntity):
                     )
         except Venus300ModbusError as err:
             _LOGGER.error("Failed to restore pre-boost state: %s", err)
+
+
+class Venus300SyncClockButton(Venus300Entity, ButtonEntity):
+    """Force-sync the unit's own real-time clock to Home Assistant's now.
+
+    This also happens automatically (once at startup and every 24h — see
+    __init__.py); this button is for an immediate on-demand sync, e.g.
+    right after a power outage without waiting for the next periodic
+    check. See time_sync.py: schedule-based features (Freecooling's
+    season/hour window) are evaluated against the unit's own clock, not
+    Home Assistant's, so keeping it accurate matters.
+    """
+
+    _attr_translation_key = "sync_unit_clock"
+    _attr_entity_category = EntityCategory.CONFIG
+
+    def __init__(self, coordinator: Venus300Coordinator, entry: Venus300ConfigEntry) -> None:
+        """Set up the sync button."""
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_sync_unit_clock"
+
+    async def async_press(self) -> None:
+        """Write Home Assistant's current time to the unit now."""
+        try:
+            await time_sync.async_force_sync(self.coordinator.client)
+        except Venus300ModbusError as err:
+            raise HomeAssistantError(str(err)) from err
+        await self.coordinator.async_request_refresh()

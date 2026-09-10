@@ -8,5 +8,5 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/kupcza/homeassistant-2vv-venus300/issues",
   "requirements": ["pymodbus>=3.7.0,<4.0"],
-  "version": "0.9.1"
+  "version": "0.10.0"
 }

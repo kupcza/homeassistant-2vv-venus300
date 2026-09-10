@@ -19,7 +19,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import Venus300ConfigEntry
+from . import Venus300ConfigEntry, time_sync
 from .coordinator import Venus300Coordinator
 from .entity import Venus300Entity
 from .registers import (
@@ -169,6 +169,7 @@ async def async_setup_entry(
     entities.append(Venus300FilterUsageHoursSensor(coordinator, entry))
     entities.append(Venus300FilterUsagePercentSensor(coordinator, entry))
     entities.append(Venus300FilterUsageResetAtSensor(coordinator, entry))
+    entities.append(Venus300ClockDriftSensor(coordinator, entry))
     async_add_entities(entities)
 
 
@@ -262,3 +263,29 @@ class Venus300FilterUsageResetAtSensor(Venus300Entity, SensorEntity):
     def native_value(self):
         """Return the last-reset timestamp."""
         return self.coordinator.data.get("filter_usage_reset_at")
+
+
+class Venus300ClockDriftSensor(Venus300Entity, SensorEntity):
+    """How far the unit's own clock has drifted from Home Assistant's.
+
+    Positive means the unit is ahead; negative means it's behind. See
+    time_sync.py: this is corrected automatically (once at startup and
+    every 24h) whenever it exceeds time_sync.DRIFT_THRESHOLD_SECONDS, and
+    on demand via button.sync_unit_clock.
+    """
+
+    _attr_translation_key = "unit_clock_drift"
+    _attr_native_unit_of_measurement = UnitOfTime.SECONDS
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_suggested_display_precision = 0
+
+    def __init__(self, coordinator: Venus300Coordinator, entry: Venus300ConfigEntry) -> None:
+        """Set up the sensor."""
+        super().__init__(coordinator, entry)
+        self._attr_unique_id = f"{entry.entry_id}_unit_clock_drift"
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the current drift, in seconds."""
+        return time_sync.current_drift_seconds(self.coordinator.data)

@@ -25,6 +25,7 @@
     },
     "button": {
       "filter_timer_reset": { "name": "Filtre Kullanım Saatini Sıfırla" },
+      "sync_unit_clock": { "name": "Ünite Saatini Şimdi Senkronize Et" },
       "boost": { "name": "Boost" }
     },
     "number": {
@@ -61,6 +62,7 @@
       "filter_usage_hours": { "name": "Filtre Kullanımı (tahmini, saat)" },
       "filter_usage_percent": { "name": "Filtre Kullanımı % (tahmini)" },
       "filter_usage_reset_at": { "name": "Son Filtre Kullanımı Sıfırlama" },
+      "unit_clock_drift": { "name": "Ünite Saati Sapması" },
       "bypass_position": { "name": "Bypass Konumu" },
       "bypass_type": {
         "name": "Bypass Tipi",

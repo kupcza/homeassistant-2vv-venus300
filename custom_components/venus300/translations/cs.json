@@ -25,6 +25,7 @@
     },
     "button": {
       "filter_timer_reset": { "name": "Reset počtu hodin filtru" },
+      "sync_unit_clock": { "name": "Synchronizovat hodiny jednotky nyní" },
       "boost": { "name": "Boost" }
     },
     "number": {
@@ -61,6 +62,7 @@
       "filter_usage_hours": { "name": "Využití filtru (odhad, hodiny)" },
       "filter_usage_percent": { "name": "Využití filtru % (odhad)" },
       "filter_usage_reset_at": { "name": "Poslední reset využití filtru" },
+      "unit_clock_drift": { "name": "Odchylka hodin jednotky" },
       "bypass_position": { "name": "Poloha bypassu" },
       "bypass_type": {
         "name": "Typ bypassu",

@@ -25,6 +25,7 @@
     },
     "button": {
       "filter_timer_reset": { "name": "Reset filter usage hours" },
+      "sync_unit_clock": { "name": "Sync unit clock now" },
       "boost": { "name": "Boost" }
     },
     "number": {
@@ -61,6 +62,7 @@
       "filter_usage_hours": { "name": "Filter usage (estimated)" },
       "filter_usage_percent": { "name": "Filter usage % (estimated)" },
       "filter_usage_reset_at": { "name": "Filter usage last reset" },
+      "unit_clock_drift": { "name": "Unit clock drift" },
       "bypass_position": { "name": "Bypass position" },
       "bypass_type": {
         "name": "Bypass type",

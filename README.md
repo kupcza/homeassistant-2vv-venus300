@@ -33,6 +33,7 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | switch | Filter hour-based tracking | holding 25018 | on/off, config category — see below |
 | button | Boost | holding 21008 | press for a self-clearing timed boost — see below |
 | button | Reset filter usage hours | holding 21015 | press after replacing a filter — see below |
+| button | Sync unit clock now | holding 16999–17006 | on-demand clock sync — see below |
 | number | Fan power setpoint | holding 21001 | 20–100 %, step 10, raw is ‰ — "off" is `switch.power` |
 | number | Boost duration (HA button only) | *(computed in HA)* | 1–60 min, default 5, config category — see below |
 | number | Boost duration (unit, all triggers) | holding 20011 | 1–60 min, default 3, config category — see below |
@@ -56,6 +57,7 @@ a `DataUpdateCoordinator` and one shared `pymodbus` TCP connection per unit.
 | sensor | Filter usage (estimated) | *(computed in HA)* | hours since last reset — see below |
 | sensor | Filter usage % (estimated) | *(computed in HA)* | % of `filter_max_hours` — see below |
 | sensor | Filter usage last reset | *(computed in HA)* | timestamp, diagnostic |
+| sensor | Unit clock drift | *(computed in HA)* | seconds, diagnostic — auto-corrected, see below |
 | sensor | Bypass position | input 15040 | % |
 | sensor | Bypass type | holding 10128 | enum, diagnostic |
 | sensor | Temperature sensor selection | holding 25008 | enum, diagnostic |
@@ -192,6 +194,24 @@ pip install pymodbus
 python3 scripts/debug_freecooling.py [host] [port] [slave_id]              # read-only
 python3 scripts/debug_freecooling.py [host] [port] [slave_id] --activate   # also writes + watches
 ```
+
+### Keeping the unit's clock accurate
+
+Found while debugging Freecooling: the unit's own real-time clock (`TIME`
+sheet, read every poll) was sitting at its factory default
+(`2000-01-01 00:00:00`, never set) and drifting freely — worth knowing
+since every schedule-based feature (Freecooling's season/hour window) is
+evaluated against it, not Home Assistant's clock. This integration now
+handles it automatically:
+
+- `sensor.unit_clock_drift` shows the current offset in seconds (positive
+  = unit ahead, negative = behind).
+- Corrected automatically once when the integration starts, and every 24h
+  after that, whenever drift exceeds 60 seconds (`time_sync.py`) —
+  writing `TIME_DRIVER`'s `Set*` fields plus `SetFlag=1`, confirmed live
+  to commit immediately (the flag self-clears back to `0` once applied).
+- `button.sync_unit_clock` forces an immediate sync on demand, e.g. right
+  after a power outage rather than waiting for the next periodic check.
 
 ### Self-clearing Boost button — two different timers, on purpose
 

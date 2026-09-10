@@ -151,6 +151,27 @@ TIME_BLOCK = ReadBlock(
     (ACTUAL_YEAR, ACTUAL_MONTH, ACTUAL_DAY, ACTUAL_HOUR, ACTUAL_MIN, ACTUAL_SEC),
 )
 
+# ---- Setting the unit's clock (Holding Registers, TIME_DRIVER sheet) ----
+# CONFIRMED working live: write these 7 fields, then write SET_TIME_FLAG=1
+# to commit them to the clock read back via TIME_BLOCK above. SET_TIME_FLAG
+# self-clears back to 0 once applied. Same wire addresses as TIME_BLOCK
+# above, but a different register kind (HOLDING vs INPUT) -- input and
+# holding registers are separate Modbus address spaces, so this doesn't
+# collide. Write-only from our side (see time_sync.py); not polled.
+
+SET_YEAR = Register("set_year", 16999, RegisterKind.HOLDING, writable=True)  # doc 17000
+SET_MONTH = Register("set_month", 17000, RegisterKind.HOLDING, writable=True)  # doc 17001
+SET_DAY = Register("set_day", 17001, RegisterKind.HOLDING, writable=True)  # doc 17002
+SET_DAY_OF_WEEK = Register(
+    "set_day_of_week", 17002, RegisterKind.HOLDING, writable=True
+)  # doc 17003, 1=Monday..7=Sunday (Python's datetime.isoweekday())
+SET_HOUR = Register("set_hour", 17003, RegisterKind.HOLDING, writable=True)  # doc 17004
+SET_MIN = Register("set_min", 17004, RegisterKind.HOLDING, writable=True)  # doc 17005
+SET_SEC = Register("set_sec", 17005, RegisterKind.HOLDING, writable=True)  # doc 17006
+SET_TIME_FLAG = Register(
+    "set_time_flag", 17006, RegisterKind.HOLDING, writable=True
+)  # doc 17007, TIME_DRIVER: SetFlag -- write 1 to commit the fields above
+
 # ---- Control block (Holding Registers, SHARE sheet) ----
 # One read/write-relevant read covers 21000..21002 in a single transaction.
 
